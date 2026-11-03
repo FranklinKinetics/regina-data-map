@@ -63,11 +63,20 @@ html.embedded header.top { display: none; }
 .seg { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); }
 .seg label { position: relative; text-align: center; padding: 8px 4px; font-size: 0.78rem; cursor: pointer; line-height: 1.2; border-left: 1px solid var(--line); }
 .seg label:first-child { border-left: 0; }
+.seg.two { grid-template-columns: repeat(2, 1fr); }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.presets button { background: var(--carbon); border: 1px solid var(--line); padding: 5px 10px; cursor: pointer; font-size: 0.78rem; min-height: 32px; }
+.presets button:hover, .presets button[aria-pressed=true] { border-color: var(--beacon); }
+.presets button[aria-pressed=true] { background: var(--steel); }
+.years { display: flex; gap: 4px; align-items: flex-end; height: 72px; margin-top: 6px; }
+.yr { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; font-size: 0.62rem; color: var(--draft-dim); text-align: center; font-variant-numeric: tabular-nums; }
+.yr i { display: block; background: var(--beacon); min-height: 2px; }
+.yr.part i { background: repeating-linear-gradient(135deg, var(--beacon) 0 3px, #b9531f 3px 6px); }
 .seg input { position: absolute; opacity: 0; pointer-events: none; }
 .seg label:has(input:checked) { background: var(--steel); color: var(--draft); box-shadow: inset 0 -3px 0 var(--beacon); }
 .seg label:has(input:focus-visible) { outline: 2px solid var(--beacon); outline-offset: -2px; }
 .field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 140px; min-width: 0; }
-select, input[type=search] { width: 100%; background: var(--carbon); color: var(--draft); border: 1px solid var(--line); padding: 8px 10px; font: inherit; min-height: 40px; border-radius: 0; }
+select, input[type=search], input[type=date] { width: 100%; background: var(--carbon); color: var(--draft); border: 1px solid var(--line); padding: 8px 10px; font: inherit; min-height: 40px; border-radius: 0; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 label.chip { display: inline-flex; align-items: center; gap: 7px; padding: 5px 10px; border: 1px solid var(--line); cursor: pointer; font-size: 0.8rem; background: var(--carbon); min-height: 34px; user-select: none; }
 label.chip input { position: absolute; opacity: 0; pointer-events: none; }
@@ -121,7 +130,21 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
 .timebar { position: absolute; z-index: 1000; left: 12px; right: 12px; bottom: 24px; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: center; background: rgba(33, 31, 33, 0.94); border: 1px solid var(--line); padding: 8px 12px; max-width: 640px; }
 .timebar .play { width: 42px; height: 42px; background: var(--beacon); border: 0; color: #1a0f08; font-size: 1.05rem; cursor: pointer; grid-row: span 2; }
 .timebar .play:hover { background: #f58450; }
-.timebar input[type=range] { width: 100%; accent-color: var(--beacon); min-height: 24px; }
+.timebar .tbmain { min-width: 0; }
+.dual { position: relative; height: 26px; }
+.dual .track { position: absolute; left: 8px; right: 8px; top: 11px; height: 4px; background: var(--steel-2); }
+.dual .hl { position: absolute; top: 0; height: 100%; background: var(--beacon); }
+.dual input[type=range] { position: absolute; left: 0; top: 0; width: 100%; height: 26px; margin: 0; background: none; pointer-events: none; -webkit-appearance: none; appearance: none; }
+.dual input[type=range]::-webkit-slider-runnable-track { background: none; height: 26px; }
+.dual input[type=range]::-moz-range-track { background: none; height: 26px; }
+.dual input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; pointer-events: auto; width: 16px; height: 24px; margin-top: 1px; background: var(--beacon); border: 2px solid #1a0f08; border-radius: 0; cursor: grab; }
+.dual input[type=range]::-moz-range-thumb { pointer-events: auto; width: 12px; height: 20px; background: var(--beacon); border: 2px solid #1a0f08; border-radius: 0; cursor: grab; }
+.dual #slider0::-webkit-slider-thumb { background: var(--draft); }
+.dual #slider0::-moz-range-thumb { background: var(--draft); }
+.dual:not(.range) #slider0 { display: none; }
+.dual input[type=range]:focus-visible { outline: none; }
+.dual input[type=range]:focus-visible::-webkit-slider-thumb { outline: 2px solid #fff; }
+.dual input[type=range]:focus-visible::-moz-range-thumb { outline: 2px solid #fff; }
 .timebar .tl { display: flex; justify-content: space-between; gap: 12px; font-size: 0.8rem; flex-wrap: wrap; }
 .timebar .tl b { font-family: var(--font-display); }
 .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--carbon); color: var(--draft); border: 1px solid var(--line); border-radius: 0; }
@@ -155,6 +178,7 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   .tabs button { font-size: 0.64rem; padding: 9px 2px 7px; }
   .leaflet-control-attribution { font-size: 0.58rem; max-width: 70%; }
 }
+@media (max-width: 520px) { .timebar #tb-count { display: none; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 </head>
@@ -168,10 +192,16 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
     <section class="mapcol" aria-label="Map">
       <div id="map" role="application" aria-label="Map of Regina building permits, zoning and proposed development. The Places tab lists the same permits by neighbourhood."></div>
       <div class="caption" id="caption" hidden role="status" aria-live="polite"><b id="cap-t"></b><p id="cap-p"></p><button type="button" id="cap-x" aria-label="Close">&times;</button></div>
-      <div class="timebar" aria-label="Time-lapse">
-        <button type="button" class="play" id="play" aria-label="Play the time-lapse">&#9654;</button>
-        <input type="range" id="slider" min="0" max="364" value="364" aria-label="Show permits issued up to this date">
-        <div class="tl"><span>Through <b id="tb-date"></b></span><span id="tb-count"></span></div>
+      <div class="timebar" aria-label="Date controls">
+        <button type="button" class="play" id="play" aria-label="Play through time">&#9654;</button>
+        <div class="tbmain">
+          <div class="dual" id="dual">
+            <div class="track"><div class="hl" id="hl"></div></div>
+            <input type="range" id="slider0" min="0" max="0" value="0" aria-label="Start date">
+            <input type="range" id="slider" min="0" max="0" value="0" aria-label="Snapshot date: show permits up to this day">
+          </div>
+          <div class="tl"><span id="tb-range"></span><span id="tb-count"></span></div>
+        </div>
       </div>
     </section>
     <aside class="panel" aria-label="Controls and facts">
@@ -187,8 +217,30 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
           <div class="stories" id="stories"></div>
           <div class="row" style="margin-top:10px">
             <button type="button" class="btn primary" id="surprise">Surprise me</button>
-            <button type="button" class="btn" id="play2">Watch the year build up</button>
+            <button type="button" class="btn" id="play2">Watch the last year build up</button>
             <button type="button" class="btn" id="reset">Reset</button>
+          </div>
+        </div>
+        <div class="sec" id="time-sec"><h2>Pick the dates</h2>
+          <p class="hint">Permits from <b id="hist-from"></b> to <b id="hist-to"></b>. Slide through time, or choose your own dates.</p>
+          <div class="seg two" id="mode" role="radiogroup" aria-label="How to choose dates">
+            <label><input type="radio" name="mode" value="snap" checked>Snapshot in time</label>
+            <label><input type="radio" name="mode" value="range">Between two dates</label>
+          </div>
+          <div id="mode-snap">
+            <p class="note">Drag the slider under the map to any day. The map shows what was issued in the stretch of time that ends on that day. Press play to travel forward.</p>
+            <div class="row" style="margin-top:8px">
+              <div class="field"><label class="mono" for="f-span">Show permits from the</label><select id="f-span"><option value="7">last week</option><option value="30">last 30 days</option><option value="90">last 3 months</option><option value="365" selected>last 12 months</option><option value="0">everything since the start</option></select></div>
+              <div class="field"><label class="mono" for="f-snap">Ending on</label><input type="date" id="f-snap"></div>
+            </div>
+          </div>
+          <div id="mode-range" hidden>
+            <p class="note">Drag both ends of the slider under the map, type two dates, or pick a shortcut. Press play to watch the period build up.</p>
+            <div class="row" style="margin-top:8px">
+              <div class="field"><label class="mono" for="f-from">From</label><input type="date" id="f-from"></div>
+              <div class="field"><label class="mono" for="f-to">To</label><input type="date" id="f-to"></div>
+            </div>
+            <div class="presets" id="presets"></div>
           </div>
         </div>
         <div class="sec"><h2>Did you know?</h2><p class="fact" id="fact"></p><div class="row" style="margin-top:8px"><button type="button" class="btn" id="fact-next">Another fact</button></div></div>
@@ -213,7 +265,6 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
         </div>
         <div class="sec"><h2>Filter the dots</h2>
           <div class="row">
-            <div class="field"><label class="mono" for="f-days">Issued in the last</label><select id="f-days"><option value="30">30 days</option><option value="90">90 days</option><option value="365" selected>12 months</option></select></div>
             <div class="field"><label class="mono" for="f-value">Declared value</label><select id="f-value"><option value="0">Any value</option><option value="50000">$50,000 and up</option><option value="250000">$250,000 and up</option><option value="1000000">$1 million and up</option><option value="10000000">$10 million and up</option></select></div>
             <div class="field"><label class="mono" for="f-hood">Neighbourhood</label><select id="f-hood"><option value="">All neighbourhoods</option></select></div>
             <div class="field"><label class="mono" for="f-q">Address or type of work</label><input type="search" id="f-q" placeholder="e.g. Westerra, laneway" autocomplete="off"></div>
@@ -296,7 +347,12 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   const fmtDate = (iso) => new Date(iso + "T12:00:00").toLocaleDateString("en-CA", { year: "numeric", month: "short", day: "numeric" });
   const median = (a) => { if (!a.length) return 0; const s = a.slice().sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
   const DAY = 86400000;
-  const addDays = (iso, n) => new Date(new Date(iso + "T12:00:00").getTime() + n * DAY).toISOString().slice(0, 10);
+  const addDays = (iso, n) => new Date(Date.parse(iso + "T12:00:00Z") + n * DAY).toISOString().slice(0, 10);
+  const T0 = A.permits_start, NDAYS = Math.round((Date.parse(M.latest + "T12:00:00Z") - Date.parse(T0 + "T12:00:00Z")) / DAY);
+  const dayIdx = (iso) => Math.max(0, Math.min(NDAYS, Math.round((Date.parse(iso + "T12:00:00Z") - Date.parse(T0 + "T12:00:00Z")) / DAY)));
+  const clampDay = (iso) => (iso < T0 ? T0 : iso > M.latest ? M.latest : iso);
+  const isDay = (v) => /^\d{4}-\d{2}-\d{2}$/.test(v || "");
+  const YEAR = D.permits.filter((p) => p.d >= addDays(M.latest, -364));
   const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const embedded = window.self !== window.top;
   if (location.protocol === "file:") $("copy").hidden = true; // a saved copy has no shareable address
@@ -312,16 +368,24 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
       note: "Estimated median household income by community association, 2021 Census (Statistics Canada). Click an area for its figures." },
     shelter: { field: "shelter", cuts: [15, 20, 25, 30], labels: ["Under 15%", "15% to 20%", "20% to 25%", "25% to 30%", "30% and up"],
       note: "Share of households spending 30% or more of income on housing, 2021 Census (Statistics Canada), estimated by community association." },
-    building: { note: "Declared construction value of the permits showing, divided by each area's 2021 population. Darker is quieter, orange is busier. The ranking follows your filters and the time-lapse." },
+    building: { note: "Declared construction value of the permits showing, divided by each area's 2021 population. Darker is quieter, orange is busier. The ranking follows your dates and filters, and a longer stretch of time adds up, so compare areas within one view." },
   };
-  const state = { days: 365, t: 364, min: 0, hood: "", q: "", groups: new Set(M.groups.map((g) => g.key)), shade: "zoning", sort: "value", showAll: false, story: "", fact: 0 };
+  const DEFAULTS = () => ({ mode: "snap", span: 365, snap: M.latest, from: addDays(M.latest, -364), to: M.latest });
+  const state = { ...DEFAULTS(), min: 0, hood: "", q: "", groups: new Set(M.groups.map((g) => g.key)), shade: "zoning", sort: "value", showAll: false, story: "", fact: 0 };
   const win = { start: addDays(M.latest, -364), upTo: M.latest };
+  function setWindow() {
+    if (state.mode === "snap") { win.upTo = state.snap; win.start = state.span ? addDays(state.snap, -(state.span - 1)) : T0; }
+    else { win.start = state.from; win.upTo = state.to; }
+    if (win.start < T0) win.start = T0;
+  }
+  $("hist-from").textContent = fmtDate(T0); $("hist-to").textContent = fmtDate(M.latest);
+  ["f-snap", "f-from", "f-to"].forEach((id) => { $(id).min = T0; $(id).max = M.latest; });
 
   $("st-latest").textContent = fmtDate(M.latest);
   $("st-fresh").textContent = live ? " · updated just now" : "";
   $("foot").innerHTML = esc(M.attribution) + " Made by Franklin Kinetics, Regina. This map is not a City of Regina service and the City has not endorsed it. Figures are information, not advice, and may contain errors.";
   $("sources").innerHTML = [
-    "City of Regina, Building Permit Report. Permits issued " + fmtDate(A.permits_start) + " to " + fmtDate(A.permits) + "; the map shows the 12 months ending " + fmtDate(M.latest) + ". Updated by the City each Thursday.",
+    "City of Regina, Building Permit Report. Permits issued " + fmtDate(A.permits_start) + " to " + fmtDate(A.permits) + "; the date controls pick any stretch of that time (the map opens on the last 12 months). Updated by the City each Thursday.",
     "City of Regina Open Data: Zoning and Land Use districts (snapshot " + fmtDate(A.zoning) + "), Road Centerline, Address Points, Parcels and Community Associations (ArcGIS open data services).",
     "City of Regina, Proposed Development notices (snapshot " + fmtDate(A.applications) + "). Rezonings are spotted by comparing the City's own zoning snapshots, so only changes since " + fmtDate("2026-07-26") + " show.",
     "Statistics Canada: population estimates for July 1, " + A.population_year + " (Table 17-10-0155-01, released " + fmtDate(A.population) + "); components of population change to " + A.migration_year + " (Table 17-10-0149-01); 2021 Census income and shelter-cost data.",
@@ -330,6 +394,8 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   $("gaps").innerHTML = [
     M.unplotted + " of " + num(M.total_permits) + " permits could not be matched to a City address point. They are counted in totals and tables but not drawn.",
     "Permit values are declared estimates, and a few very large permits can dominate an area's total.",
+    "Older permits are placed using today's City address points, zoning and community areas. An address that has since been renumbered or removed can't be placed, and the zone shown for an older permit is today's zone, not the zone at the time.",
+    "A permit number that appears more than once in the City's files (re-issued permits and repeated rows, about 20 in six years) is counted once, on its first issue date.",
     "The City's zoning district map and its parcel layer sometimes disagree about a property's zone (about 15% of permits). The map uses the district map.",
     "Permits are listed when issued. Work done without a permit, or outside the city limits, is not included. The City publishes weekly, so the newest days are missing.",
     "Names of people and companies are left out on purpose: this map is about places and projects.",
@@ -464,8 +530,7 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   }
   let current = [], lastRecent = [];
   function refresh() {
-    win.start = addDays(M.latest, -(state.days - 1));
-    win.upTo = addDays(win.start, state.t);
+    setWindow();
     current = D.permits.filter(passes);
     const showPermits = $("t-permits").checked;
     lastRecent.forEach((m) => m.setStyle({ weight: 0.6, color: "#15130f" })); lastRecent = [];
@@ -484,10 +549,30 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
     const unplotted = current.filter((p) => p.lon == null).length, big = current.slice().sort((x, y) => y.v - x.v)[0];
     $("s-note").textContent = (unplotted ? unplotted + " of these permits have no exact map location and are counted but not drawn. " : "") +
       (big && total && big.v / total > 0.1 ? "The largest permit (" + big.a + ", " + short(big.v) + ") is " + Math.round(100 * big.v / total) + "% of this total." : "");
-    $("tb-date").textContent = fmtDate(win.upTo);
     $("tb-count").innerHTML = "<b>" + num(current.length) + "</b> permits &middot; <b>" + short(total) + "</b>";
-    $("slider").max = state.days - 1; $("slider").value = state.t;
+    syncTime();
     restyleShade(); renderHoods(); renderSpot(); writeHash();
+  }
+  const PRESET_LIST = (() => {
+    const last = +M.latest.slice(0, 4), first = +T0.slice(0, 4), list = [{ l: "Last 12 months", f: addDays(M.latest, -364), t: M.latest }];
+    for (let y = last; y >= first; y--) list.push({ l: y === last ? y + " so far" : String(y), f: clampDay(y + "-01-01"), t: clampDay(y + "-12-31") });
+    list.push({ l: "Everything", f: T0, t: M.latest });
+    return list;
+  })();
+  $("presets").innerHTML = PRESET_LIST.map((x, i) => '<button type="button" data-i="' + i + '" aria-pressed="false">' + esc(x.l) + "</button>").join("");
+  function syncTime() {
+    const range = state.mode === "range", si = dayIdx(win.start), ei = dayIdx(win.upTo), s1 = $("slider"), s0 = $("slider0");
+    $("dual").classList.toggle("range", range);
+    s1.max = s0.max = NDAYS; s1.value = ei; s0.value = si;
+    s0.style.zIndex = si > NDAYS * 0.6 ? 3 : 1; s1.style.zIndex = 2;
+    $("hl").style.left = (100 * si / NDAYS) + "%"; $("hl").style.width = Math.max(0.5, 100 * (ei - si) / NDAYS) + "%";
+    s1.setAttribute("aria-valuetext", fmtDate(win.upTo)); s0.setAttribute("aria-valuetext", fmtDate(win.start));
+    s1.setAttribute("aria-label", range ? "End date" : "Snapshot date: show permits up to this day");
+    $("tb-range").innerHTML = "Showing <b>" + fmtDate(win.start) + "</b> to <b>" + fmtDate(win.upTo) + "</b>";
+    document.querySelector('#mode input[value="' + state.mode + '"]').checked = true;
+    $("mode-snap").hidden = range; $("mode-range").hidden = !range;
+    $("f-span").value = String(state.span); $("f-snap").value = state.snap; $("f-from").value = state.from; $("f-to").value = state.to;
+    document.querySelectorAll("#presets button").forEach((b) => { const x = PRESET_LIST[+b.dataset.i]; b.setAttribute("aria-pressed", range && x.f === state.from && x.t === state.to ? "true" : "false"); });
   }
   const newUnits = (rs) => rs.filter((p) => p.g === "new-homes" || p.g === "new-multi").reduce((a, c) => a + (c.t === "Backyard/Laneway Suite" ? 0 : c.units), 0);
 
@@ -521,10 +606,21 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
       '<div class="stat"><div class="n">' + num(newUnits(mine)) + '</div><div class="l">new homes</div></div><div class="stat"><div class="n">' + (mine.length ? short(median(mine.map((p) => p.v))) : "–") + '</div><div class="l">median permit</div></div></div>' +
       (mine.length ? '<p class="note" style="margin-top:10px">What is being built (by number of permits)</p><div class="mix">' + mix.map((g) => '<i style="width:' + (100 * mixCount[g.key] / mine.length) + "%;background:" + GROUP_COLOR[g.key] + '" title="' + esc(g.label) + '"></i>').join("") + '</div><div class="mixkey">' +
         mix.map((g) => '<span><b style="background:' + GROUP_COLOR[g.key] + '"></b>' + esc(g.label) + " " + mixCount[g.key] + "</span>").join("") + "</div>" : "") +
-      (top ? '<p style="margin:12px 0 0">Biggest project showing: <b>' + esc(top.a) + "</b>, " + esc(what(top)) + ", " + short(top.v) + ' <button type="button" class="pp-b" data-find="' + esc(top.id) + '">Show on map</button></p>' : "") +
+      yearBars() +
+      (top ? '<p style="margin:12px 0 0">Biggest project showing:<b>' + esc(top.a) + "</b>, " + esc(what(top)) + ", " + short(top.v) + ' <button type="button" class="pp-b" data-find="' + esc(top.id) + '">Show on map</button></p>' : "") +
       (ca && ca.income ? '<p class="note" style="margin-top:10px">Part of the ' + esc(ca.name) + " community area (2021 Census, estimated): median household income " + money(ca.income) + (ca.shelter != null ? "; " + ca.shelter + "% of households spend 30% or more of income on housing" : "") + ".</p>" : "") +
       '<div class="row" style="margin-top:10px"><button type="button" class="btn" id="spot-clear">Back to the whole city</button></div></div>';
     $("spot-clear").addEventListener("click", () => { setHood(""); fitCity(); });
+  }
+  function yearBars() {
+    const yv = {}, first = +T0.slice(0, 4), last = +M.latest.slice(0, 4), years = [];
+    D.permits.forEach((p) => { if (p.n === state.hood && state.groups.has(p.g) && p.v >= state.min) { const y = p.d.slice(0, 4); yv[y] = (yv[y] || 0) + p.v; } });
+    for (let y = first; y <= last; y++) years.push(y);
+    const top = Math.max(1, ...years.map((y) => yv[y] || 0));
+    if (!years.some((y) => yv[y])) return "";
+    const label = "Declared permit value by year in " + state.hood + ": " + years.map((y) => y + " " + short(yv[y] || 0)).join(", ");
+    return '<p class="note" style="margin-top:12px">Declared value by year, all dates (your type and size filters apply). Striped bar: the year so far.</p><div class="years" role="img" aria-label="' + esc(label) + '">' +
+      years.map((y) => '<div class="yr' + (y === last ? " part" : "") + '" title="' + y + ": " + short(yv[y] || 0) + '"><i style="height:' + Math.max(2, 56 * (yv[y] || 0) / top).toFixed(1) + 'px"></i><span>' + String(y).slice(2) + "</span></div>").join("") + "</div>";
   }
   function setHood(n) { state.hood = n; $("f-hood").value = n; refresh(); }
   function spotlight(n) {
@@ -546,11 +642,11 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
       cap: (c) => { const u = newUnits(c), [h, hu] = topBy(c.filter((p) => p.t !== "Backyard/Laneway Suite"), (p) => p.n, (p) => p.units);
         return [c.length + " permits for new homes and apartment buildings", "Together they add about " + num(u) + " homes. The most: " + (h || "none") + " (" + num(hu) + "). Click a dot to see what it is."]; } },
     { id: "big", t: "The $10 million club", s: "Only the biggest projects", groups: null, min: 10000000,
-      cap: (c) => { const tot = c.reduce((a, p) => a + p.v, 0), all = D.permits.reduce((a, p) => a + p.v, 0), b = c.slice().sort((x, y) => y.v - x.v)[0];
+      cap: (c) => { const tot = c.reduce((a, p) => a + p.v, 0), all = YEAR.reduce((a, p) => a + p.v, 0), b = c.slice().sort((x, y) => y.v - x.v)[0];
         return [c.length + " projects of $10 million or more", "They add up to " + compact(tot) + ", about " + Math.round(100 * tot / all) + "% of everything permitted this year." + (b ? " The biggest: " + what(b) + " at " + b.a + ", " + compact(b.v) + "." : "")]; } },
     { id: "suites", t: "Suites and basements", s: "A quiet way Regina adds housing", groups: ["suites"],
       cap: (c) => { const [h, hn] = topBy(c, (p) => p.n, () => 1); return [c.length + " permits for secondary suites and basement developments", "Not new buildings, but new places to live in existing ones. Most in " + (h || "none") + " (" + hn + ")."]; } },
-    { id: "month", t: "What's new this month", s: "The last 30 days of permits", groups: null, days: 30,
+    { id: "month", t: "What's new this month", s: "The last 30 days of permits", groups: null, span: 30,
       cap: (c) => { const tot = c.reduce((a, p) => a + p.v, 0), b = c.slice().sort((x, y) => y.v - x.v)[0]; return [num(c.length) + " permits in the last 30 days", compact(tot) + " of declared construction value." + (b ? " The biggest: " + what(b) + " at " + b.a + ", " + compact(b.v) + "." : "")]; } },
     { id: "commercial", t: "Shops, offices and factories", s: "New commercial buildings and renovations", groups: ["new-commercial", "commercial-reno"],
       cap: (c) => { const tot = c.reduce((a, p) => a + p.v, 0), [h] = topBy(c, (p) => p.n, (p) => p.v); return [num(c.length) + " commercial, industrial and institutional permits", compact(tot) + " declared. The most value: " + (h || "none") + "."]; } },
@@ -560,16 +656,16 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   $("stories").innerHTML = STORIES.map((s, i) => '<button type="button" class="story" data-story="' + s.id + '" aria-pressed="false"><span class="n">0' + (i + 1) + '</span><span><b>' + esc(s.t) + '</b><span class="s">' + esc(s.s) + "</span></span></button>").join("");
   function storyButtons() { document.querySelectorAll(".story").forEach((b) => b.setAttribute("aria-pressed", b.dataset.story === state.story ? "true" : "false")); }
   function setGroups(list) { state.groups = new Set(list || M.groups.map((g) => g.key)); document.querySelectorAll("#chips input").forEach((i) => { i.checked = state.groups.has(i.value); }); }
-  function setControls() { $("f-days").value = String(state.days); $("f-value").value = String(state.min); $("f-hood").value = state.hood; $("f-q").value = state.q; }
+  function setControls() { $("f-value").value = String(state.min); $("f-hood").value = state.hood; $("f-q").value = state.q; }
   function resetAll() {
-    stop(); Object.assign(state, { days: 365, t: 364, min: 0, hood: "", q: "", shade: "zoning", story: "", showAll: false });
+    stop(); Object.assign(state, DEFAULTS(), { min: 0, hood: "", q: "", shade: "zoning", story: "", showAll: false });
     setGroups(null); setControls(); $("t-permits").checked = true; $("t-events").checked = true; $("t-roads").checked = true;
     eventLayer.addTo(map); roadLayer.addTo(map); syncRoadNames(); document.querySelector('#shade input[value="zoning"]').checked = true; storyButtons(); hideCaption();
   }
   function runStory(id) {
     const s = STORIES.find((x) => x.id === id); if (!s) return;
     if (state.story === id) { resetAll(); refresh(); fitCity(); return; }
-    resetAll(); state.story = id; setGroups(s.groups); if (s.min) state.min = s.min; if (s.days) { state.days = s.days; state.t = s.days - 1; }
+    resetAll(); state.story = id; setGroups(s.groups); if (s.min) state.min = s.min; if (s.span) state.span = s.span;
     if (s.events) { $("t-permits").checked = false; }
     setControls(); storyButtons(); refresh();
     if (s.events) { const pts = D.rezonings.map((r) => [r.lat, r.lon]).concat(D.applications.filter((a) => a.lon != null).map((a) => [a.lat, a.lon])); if (pts.length) map.fitBounds(L.latLngBounds(pts).pad(0.35), { maxZoom: 14, animate: !reduced }); }
@@ -592,7 +688,7 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   });
 
   function buildFacts() {
-    const all = D.permits, total = all.reduce((a, p) => a + p.v, 0), fs = [];
+    const all = YEAR, total = all.reduce((a, p) => a + p.v, 0), fs = [];
     fs.push("In the 12 months to " + fmtDate(M.latest) + " the City issued " + num(all.length) + " building permits with " + compact(total) + " of declared construction value. That is about " + Math.round(all.length / 250) + " permits every working day.");
     const [h1, n1] = topBy(all, (p) => p.n, () => 1); fs.push("Busiest neighbourhood by number of permits: " + h1 + " (" + num(n1) + ").");
     const [h2, u2] = topBy(all.filter((p) => p.t !== "Backyard/Laneway Suite"), (p) => p.n, (p) => (p.g === "new-homes" || p.g === "new-multi" ? p.units : 0)); fs.push("Most new homes permitted: " + h2 + ", about " + num(u2) + " of them.");
@@ -601,6 +697,11 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
     const wd = {}; all.forEach((p) => { const k = new Date(p.d + "T12:00:00").toLocaleDateString("en-CA", { weekday: "long" }); wd[k] = (wd[k] || 0) + 1; }); const bw = Object.entries(wd).sort((a, b) => b[1] - a[1])[0];
     fs.push("The City issues the most permits on " + bw[0] + "s (" + num(bw[1]) + " in the last year).");
     const lan = all.filter((p) => p.t === "Backyard/Laneway Suite").length; fs.push(num(lan) + " backyard or laneway suites were permitted in the last 12 months.");
+    const A_ = D.permits, yr = {}; A_.forEach((p) => { const y = p.d.slice(0, 4); yr[y] = (yr[y] || 0) + p.v; });
+    fs.push("Since " + fmtDate(T0) + " the City has issued " + num(A_.length) + " building permits worth " + compact(A_.reduce((a, p) => a + p.v, 0)) + ". Use the date controls to travel through all of it.");
+    const full = Object.entries(yr).filter(([y]) => +y < +M.latest.slice(0, 4)).sort((a, b) => b[1] - a[1])[0];
+    if (full) fs.push("The biggest full year for declared construction value since " + T0.slice(0, 4) + " was " + full[0] + ", at " + compact(full[1]) + ".");
+    const bigAll = A_.slice().sort((a, b) => b.v - a.v)[0]; fs.push("The biggest permit since " + T0.slice(0, 4) + ": " + what(bigAll) + " at " + bigAll.a + ", " + compact(bigAll.v) + ", issued " + fmtDate(bigAll.d) + ".");
     const pops = D.series.population, pf = pops[0], pl = pops[pops.length - 1]; fs.push("Regina grew from " + num(pf.v) + " people in " + pf.y + " to " + num(pl.v) + " in " + pl.y + ", up " + Math.round(100 * (pl.v / pf.v - 1)) + "% (Statistics Canada).");
     return fs;
   }
@@ -611,22 +712,45 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
 
   // ---------------------------------------------------------------- time-lapse
   let timer = null, playing = false;
-  function stop() { playing = false; clearInterval(timer); timer = null; $("play").innerHTML = "&#9654;"; $("play").setAttribute("aria-label", "Play the time-lapse"); }
+  function stop() { playing = false; clearInterval(timer); timer = null; $("play").innerHTML = "&#9654;"; $("play").setAttribute("aria-label", "Play through time"); }
   function play() {
     if (playing) { stop(); return; }
-    if (state.t >= state.days - 1) state.t = 0;
-    playing = true; $("play").innerHTML = "&#10073;&#10073;"; $("play").setAttribute("aria-label", "Pause the time-lapse");
-    const step = Math.max(1, Math.round(state.days / 70));
-    refresh();
-    timer = setInterval(() => { state.t = Math.min(state.days - 1, state.t + step); refresh(); if (state.t >= state.days - 1) stop(); }, 110);
+    playing = true; $("play").innerHTML = "&#10073;&#10073;"; $("play").setAttribute("aria-label", "Pause");
+    if (state.mode === "snap") {
+      if (state.snap >= M.latest) state.snap = addDays(T0, state.span ? state.span - 1 : 0);
+      const step = Math.max(1, Math.ceil(NDAYS / 160));
+      refresh();
+      timer = setInterval(() => { state.snap = state.snap >= addDays(M.latest, -step) ? M.latest : addDays(state.snap, step); refresh(); if (state.snap >= M.latest) stop(); }, 110);
+    } else {
+      const final = state.to, step = Math.max(1, Math.round((dayIdx(final) - dayIdx(state.from)) / 70));
+      state.to = state.from; refresh();
+      timer = setInterval(() => { state.to = state.to >= addDays(final, -step) ? final : addDays(state.to, step); refresh(); if (state.to >= final) stop(); }, 110);
+    }
   }
+  const touched = () => { state.story = ""; storyButtons(); };
+  const setRange = (f, t) => { stop(); state.mode = "range"; state.from = clampDay(f); state.to = clampDay(t); touched(); refresh(); };
   $("play").addEventListener("click", play);
-  $("play2").addEventListener("click", () => { if (!playing) { state.t = 0; } play(); });
-  $("slider").addEventListener("input", (e) => { stop(); state.t = +e.target.value; refresh(); });
+  $("play2").addEventListener("click", () => { stop(); setRange(addDays(M.latest, -364), M.latest); play(); });
+  $("slider").addEventListener("input", (e) => {
+    stop(); const d = addDays(T0, +e.target.value); touched();
+    if (state.mode === "snap") state.snap = d; else state.to = d < state.from ? state.from : d;
+    refresh();
+  });
+  $("slider0").addEventListener("input", (e) => { stop(); const d = addDays(T0, +e.target.value); touched(); state.from = d > state.to ? state.to : d; refresh(); });
+  document.querySelectorAll("#mode input").forEach((r) => r.addEventListener("change", (e) => {
+    stop(); touched();
+    if (e.target.value === "range" && state.mode === "snap") { state.from = win.start; state.to = win.upTo; }
+    if (e.target.value === "snap" && state.mode === "range") state.snap = state.to;
+    state.mode = e.target.value; refresh();
+  }));
+  $("f-span").addEventListener("change", (e) => { stop(); touched(); state.span = +e.target.value; refresh(); });
+  $("f-snap").addEventListener("change", (e) => { if (!isDay(e.target.value)) return; stop(); touched(); state.snap = clampDay(e.target.value); refresh(); });
+  $("f-from").addEventListener("change", (e) => { if (!isDay(e.target.value)) return; stop(); touched(); state.from = clampDay(e.target.value); if (state.to < state.from) state.to = state.from; refresh(); });
+  $("f-to").addEventListener("change", (e) => { if (!isDay(e.target.value)) return; stop(); touched(); state.to = clampDay(e.target.value); if (state.from > state.to) state.from = state.to; refresh(); });
+  $("presets").addEventListener("click", (e) => { const b = e.target.closest("button[data-i]"); if (b) { const x = PRESET_LIST[+b.dataset.i]; setRange(x.f, x.t); } });
 
   // ---------------------------------------------------------------- wiring
   $("chips").addEventListener("change", (e) => { e.target.checked ? state.groups.add(e.target.value) : state.groups.delete(e.target.value); state.story = ""; storyButtons(); refresh(); });
-  $("f-days").addEventListener("change", (e) => { state.days = +e.target.value; state.t = state.days - 1; state.story = ""; storyButtons(); refresh(); });
   $("f-value").addEventListener("change", (e) => { state.min = +e.target.value; state.story = ""; storyButtons(); refresh(); });
   $("f-hood").addEventListener("change", (e) => { if (e.target.value) spotlight(e.target.value); else { setHood(""); fitCity(); } });
   let qTimer;
@@ -670,17 +794,30 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
       g += '<polyline fill="none" stroke="' + s.color + '" stroke-width="2" points="' + s.pts.map((p) => X(p.x).toFixed(1) + "," + Y(p.y).toFixed(1)).join(" ") + '"/>';
       const last = s.pts[s.pts.length - 1];
       g += '<circle cx="' + X(last.x) + '" cy="' + Y(last.y) + '" r="3" fill="' + s.color + '"/><text class="lb" x="' + (X(last.x) + 6) + '" y="' + (Y(last.y) + 4) + '" fill="' + s.color + '">' + esc(opts.fmt(last.y)) + "</text>";
-      s.pts.forEach((p) => { g += '<circle cx="' + X(p.x) + '" cy="' + Y(p.y) + '" r="7" fill="transparent"><title>' + esc(s.name + ", " + p.x + ": " + opts.fmt(p.y)) + "</title></circle>"; });
+      s.pts.forEach((p) => { g += '<circle cx="' + X(p.x) + '" cy="' + Y(p.y) + '" r="7" fill="transparent"><title>' + esc(s.name + ", " + (p.l || p.x) + ": " + opts.fmt(p.y)) + "</title></circle>"; });
     });
     if (series.length === 1) { const f0 = series[0].pts[0]; g += '<text class="ax" x="' + (X(f0.x) + 2) + '" y="' + (Y(f0.y) - 7) + '">' + esc(opts.fmt(f0.y)) + "</text>"; }
-    g += '<text class="ax" x="' + m.l + '" y="' + (H - 4) + '">' + x0 + '</text><text class="ax" x="' + (W - m.r) + '" y="' + (H - 4) + '" text-anchor="end">' + x1 + "</text>";
+    const xf = opts.xfmt || ((v) => v);
+    g += '<text class="ax" x="' + m.l + '" y="' + (H - 4) + '">' + xf(x0) + '</text><text class="ax" x="' + (W - m.r) + '" y="' + (H - 4) + '" text-anchor="end">' + xf(x1) + "</text>";
     const key = series.length > 1 ? '<p style="margin:4px 0 0">' + series.map((s) => '<span style="color:' + s.color + '">&#9632;</span> ' + esc(s.name)).join(" &nbsp; ") + "</p>" : "";
-    const label = title + ". " + series.map((s) => s.name + " " + opts.fmt(s.pts[0].y) + " in " + s.pts[0].x + " to " + opts.fmt(s.pts[s.pts.length - 1].y) + " in " + s.pts[s.pts.length - 1].x).join("; ");
+    const label = title + ". " + series.map((s) => s.name + " " + opts.fmt(s.pts[0].y) + " in " + (s.pts[0].l || s.pts[0].x) + " to " + opts.fmt(s.pts[s.pts.length - 1].y) + " in " + (s.pts[s.pts.length - 1].l || s.pts[s.pts.length - 1].x)).join("; ");
     return '<div class="chart"><h3>' + esc(title) + "</h3><p>" + esc(sub) + '</p><svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(label) + '">' + g + "</svg>" + key + "</div>";
   }
   (function charts() {
     const S = D.series, B = "#ED6B2E", C = "#56B4E9", G = "#2FCB9A", Y = "#F0E442";
-    $("charts").innerHTML =
+    // building permits by month since the start of the data (complete months only)
+    const by = {};
+    D.permits.forEach((p) => { const k = p.d.slice(0, 7), m = by[k] || (by[k] = { n: 0, v: 0, h: 0 }); m.n++; m.v += p.v; m.h += newUnits([p]); });
+    const keys = Object.keys(by).sort(), dim = new Date(+M.latest.slice(0, 4), +M.latest.slice(5, 7), 0).getDate();
+    if (+M.latest.slice(8, 10) < dim) keys.pop();
+    const mx = (k) => +k.slice(0, 4) + (+k.slice(5, 7) - 1) / 12, ml = (k) => new Date(k + "-15T12:00:00").toLocaleDateString("en-CA", { month: "short", year: "numeric" });
+    const roll = (f) => keys.map((k, i) => (i < 11 ? null : { x: mx(k), l: "12 months to " + ml(k), y: keys.slice(i - 11, i + 1).reduce((a, kk) => a + f(by[kk]), 0) })).filter(Boolean);
+    const yrs = (v) => String(Math.floor(v + 1e-6));
+    const built = keys.length < 14 ? "" :
+      lineChart("Permits issued each month", "Every complete month since " + ml(keys[0]) + ". Winter dips and summer peaks are normal.", [{ name: "Permits", color: B, pts: keys.map((k) => ({ x: mx(k), l: ml(k), y: by[k].n })) }], { fmt: num, zero: true, xfmt: yrs }) +
+      lineChart("How much is being built", "Declared construction value of all permits issued in the 12 months up to each month. A few huge projects can make it jump.", [{ name: "Declared value", color: B, pts: roll((m) => m.v) }], { fmt: short, zero: true, xfmt: yrs }) +
+      lineChart("New homes permitted", "Homes on new house, apartment and townhouse permits in the 12 months up to each month. Suites are counted separately.", [{ name: "New homes", color: C, pts: roll((m) => m.h) }], { fmt: num, zero: true, xfmt: yrs });
+    $("charts").innerHTML = built +
       lineChart("People living in Regina", "Population estimate, July 1 each year (Statistics Canada). The scale does not start at zero.", [{ name: "Population", color: B, pts: S.population.map((p) => ({ x: p.y, y: p.v })) }], { fmt: num, zero: false }) +
       lineChart("The average rent", "Average rent for a purpose-built rental unit, every October (CMHC).", [{ name: "Average rent", color: B, pts: S.rent.map((r) => ({ x: r.y, y: r.rent })) }], { fmt: (v) => money(v), zero: true }) +
       lineChart("How easy is it to find a place?", "Rental vacancy rate, per cent of units empty (CMHC). Lower means tighter.", [{ name: "Vacancy rate", color: C, pts: S.rent.map((r) => ({ x: r.y, y: r.vac })) }], { fmt: (v) => v.toFixed(1) + "%", zero: true }) +
@@ -693,8 +830,8 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   // ---------------------------------------------------------------- share link
   function writeHash() {
     const h = [], all = M.groups.map((g) => g.key);
-    if (state.days !== 365) h.push("days=" + state.days);
-    if (state.t !== state.days - 1) h.push("t=" + state.t);
+    if (state.mode === "range") h.push("from=" + state.from, "to=" + state.to);
+    else { if (state.span !== 365) h.push("span=" + state.span); if (state.snap !== M.latest) h.push("snap=" + state.snap); }
     if (state.min) h.push("min=" + state.min);
     if (state.hood) h.push("hood=" + encodeURIComponent(state.hood));
     if (state.q) h.push("q=" + encodeURIComponent(state.q));
@@ -710,7 +847,9 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   function readHash() {
     const h = location.hash.replace(/^#/, ""); if (!h) return false;
     const q = Object.fromEntries(h.split("&").map((x) => { const i = x.indexOf("="); return [x.slice(0, i), decodeURIComponent(x.slice(i + 1))]; }));
-    if (q.days) state.days = +q.days; state.t = q.t != null ? +q.t : state.days - 1; if (q.min) state.min = +q.min; if (q.hood) state.hood = q.hood; if (q.q) state.q = q.q.toLowerCase();
+    if (isDay(q.from) && isDay(q.to)) { state.mode = "range"; state.from = clampDay(q.from); state.to = clampDay(q.to); if (state.to < state.from) state.to = state.from; }
+    else { if (q.span != null && [0, 7, 30, 90, 365].includes(+q.span)) state.span = +q.span; if (isDay(q.snap)) state.snap = clampDay(q.snap); }
+    if (q.min) state.min = +q.min; if (q.hood) state.hood = q.hood; if (q.q) state.q = q.q.toLowerCase();
     if (q.g) setGroups(q.g.split(",")); if (q.shade && SHADES[q.shade]) { state.shade = q.shade; const r = document.querySelector('#shade input[value="' + q.shade + '"]'); if (r) r.checked = true; }
     if (q.ev === "0") { $("t-events").checked = false; map.removeLayer(eventLayer); } if (q.rd === "0") { $("t-roads").checked = false; map.removeLayer(roadLayer); } if (q.pm === "0") $("t-permits").checked = false;
     setControls(); if (q.q) $("f-q").value = q.q;
@@ -719,7 +858,7 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   }
   const restored = readHash();
   syncRoadNames(); refresh();
-  if (!restored) { caption("Click anything", "Every dot is a building permit the City issued. Pick a story, press play to watch the year build up, or hit Surprise me."); introTimer = setTimeout(hideCaption, 12000); }
+  if (!restored) { caption("Click anything", "Every dot is a building permit the City issued. Pick a story, slide through time since " + T0.slice(0, 4) + ", or hit Surprise me."); introTimer = setTimeout(hideCaption, 12000); }
   window.addEventListener("resize", () => map.invalidateSize());
   const settle = () => { map.invalidateSize(); if (!restored && !state.hood && !state.story) fitCity(); };
   requestAnimationFrame(settle); setTimeout(settle, 350);

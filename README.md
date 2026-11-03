@@ -8,7 +8,7 @@ This repository keeps the map's data fresh. Every Friday morning it downloads th
 
 Government open data only:
 
-- **City of Regina open data:** building permits, zoning, streets, addresses, proposed development notices. Contains information licensed under the Open Government Licence - City of Regina.
+- **City of Regina open data:** every building permit the City has published since January 2020 (shown with a date slider and a two-date picker), zoning, streets, addresses, proposed development notices. Contains information licensed under the Open Government Licence - City of Regina.
 - **Statistics Canada:** population estimates, components of population change and the 2021 Census of Population. Adapted from Statistics Canada, Tables 17-10-0155-01 and 17-10-0149-01 and the 2021 Census of Population. This does not constitute an endorsement by Statistics Canada of this product.
 - **Canada Mortgage and Housing Corporation:** Rental Market Survey (rents and vacancy).
 
@@ -18,7 +18,7 @@ No company, applicant or owner names are published here. Names in the City's per
 
 `.github/workflows/refresh.yml` runs these steps, and stops at the first one that fails, which leaves the last good version live:
 
-1. `python -m scraper.run` downloads the data and runs the checks (counts and dollar totals must reconcile with the City's own files; no suspicious drops or swings).
+1. `python -m scraper.run` downloads the data and runs the checks (counts and dollar totals must reconcile with the City's own files; no suspicious drops or swings; at least 80% of permits must match a City address point). The permit history is rebuilt in full each week from the City's yearly files, 2020 to today.
 2. `python -m scripts.build_lab_map` builds the map file and `latest-v1.json`, the data file that downloaded maps look for.
 3. A sanity check confirms the new data file looks right.
 4. `python -m scripts.prune_state` removes applicant names and trims the saved state, which is then committed back here for next week's comparison (this is how rezonings are spotted).

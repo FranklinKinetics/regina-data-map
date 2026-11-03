@@ -47,7 +47,7 @@ jobs:
           import json
           d = json.load(open("lab-02/latest-v1.json", encoding="utf-8"))
           assert d["meta"]["schema"] == 1, "unexpected data format"
-          assert len(d["permits"]) > 1000, "too few permits: " + str(len(d["permits"]))
+          assert len(d["permits"]) > 10000, "too few permits: " + str(len(d["permits"]))
           assert len(d["zoning"]["features"]) > 10, "zoning missing"
           print("ok:", len(d["permits"]), "permits through", d["meta"]["latest"])
           PY

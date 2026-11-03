@@ -10,13 +10,14 @@ No account, no install, and it doesn't need internet once you have the file. (Wi
 
 WHAT TO TRY
 - Pick a story on the left: "The $10 million club", "Suites and basements", "What's new this month".
-- Press play to watch a year of Regina building permits appear on the map.
+- Slide through time: drag the bar under the map to any day since January 2020, or switch to "Between two dates" and pick your own dates (or a shortcut like 2022).
+- Press play to travel forward through the years, or to watch a period build up.
 - Click "Surprise me".
 - Shade the map by zoning, income, housing cost or building per person.
 - Click any dot or any neighbourhood.
 
 HOW FRESH IS IT
-Built on {built}. Building permits run through {permits_through}. The City of Regina updates its permit list every Thursday, so newer permits are not in your copy. The map shows its own "data as of" dates in the About tab.
+Built on {built}. Building permits run from January 2020 through {permits_through}. The City of Regina updates its permit list every Thursday, so newer permits are not in your copy. The map shows its own "data as of" dates in the About tab.
 For the latest version, come back to the product page at franklinkinetics.com and download again.
 
 WHERE THE DATA COMES FROM (government sources only)

@@ -117,3 +117,61 @@ def fetch_permits(today: date | None = None) -> tuple[list[dict], dict]:
         "files": source_meta,
     }
     return df.to_dict(orient="records"), meta
+
+
+# ---------------------------------------------------------------------------
+# Full history for the public Lab map (every year the City still publishes).
+# Separate from fetch_permits() on purpose: the Build Watch pages keep their
+# trailing-window behaviour, and older files are laid out differently (fewer
+# columns, "Cost of construction" in lower case), so this reader is lenient
+# about optional columns but strict about the ones the map needs.
+# ---------------------------------------------------------------------------
+HISTORY_FIRST_YEAR = 2020
+HISTORY_COLUMNS = [
+    "Permit Number", "Permit Application Type", "Date Issued", "Building Use", "Work Class",
+    "Estimated Cost of Construction", "Number of Units", "Location", "Subdivision Code",
+]
+_HISTORY_NAMES = {
+    "permit number": "Permit Number", "permit application type": "Permit Application Type", "date issued": "Date Issued",
+    "building use": "Building Use", "work class": "Work Class", "cost of construction": "Estimated Cost of Construction",
+    "estimated cost of construction": "Estimated Cost of Construction", "number of units": "Number of Units",
+    "location": "Location", "subdivision code": "Subdivision Code",
+}
+
+
+def _load_history_year(resource: dict) -> pd.DataFrame:
+    resp = requests.get(resource["url"], headers=HEADERS, timeout=120)
+    resp.raise_for_status()
+    df = pd.read_excel(io.BytesIO(resp.content), sheet_name=0)
+    norm = lambda c: str(c).strip().rstrip(":").strip().lower()  # the 2023 file has "Cost of construction:"
+    df = df.rename(columns={c: _HISTORY_NAMES[norm(c)] for c in df.columns if norm(c) in _HISTORY_NAMES})
+    missing = set(HISTORY_COLUMNS) - set(df.columns)
+    if missing:
+        raise RuntimeError(f"Building Permit Report {resource['year']} is missing expected columns: {missing}")
+    return df[HISTORY_COLUMNS].assign(**{"Report Year": resource["year"]})
+
+
+def fetch_permit_history(first_year: int = HISTORY_FIRST_YEAR, today: date | None = None) -> tuple[list[dict], dict]:
+    """Every published permit from `first_year` to today, one row per permit number,
+    plus metadata that lets a run reconcile its output against the source files."""
+    today = today or date.today()
+    resources = _resources_for_years(list(range(first_year, today.year + 1)))
+    frames, files = [], []
+    for res in resources:
+        df = _load_history_year(res)
+        df["Date Issued"] = pd.to_datetime(df["Date Issued"], errors="coerce")
+        df["Estimated Cost of Construction"] = pd.to_numeric(df["Estimated Cost of Construction"], errors="coerce")
+        no_date = int(df["Date Issued"].isna().sum())
+        df = df[df["Date Issued"].notna()]
+        files.append({"year": res["year"], "file": res["url"].rsplit("/", 1)[-1], "rows_in_file": int(len(df) + no_date), "rows_without_date": no_date})
+        frames.append(df)
+    df = pd.concat(frames, ignore_index=True)
+    before = len(df)
+    df = df.drop_duplicates(subset="Permit Number", keep="first").copy()
+    df["Date Issued"] = df["Date Issued"].dt.strftime("%Y-%m-%d")
+    meta = {
+        "first_year": first_year, "files": files, "duplicate_permit_rows_dropped": int(before - len(df)),
+        "rows_in_window": int(len(df)), "cost_total_in_window": float(df["Estimated Cost of Construction"].sum()),
+        "non_numeric_cost_rows": int(df["Estimated Cost of Construction"].isna().sum()),
+    }
+    return df.to_dict(orient="records"), meta

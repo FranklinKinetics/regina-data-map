@@ -92,11 +92,12 @@ def _plottable(r: dict) -> bool:
     return r["lon"] is not None and r.get("Geocode Method") == "city_address_point"
 
 
-def load_permits() -> tuple[list[dict], date, dict]:
-    fc = json.loads((DATA / "permits" / "latest.geojson").read_text(encoding="utf-8"))
+def load_permits(path: Path | None = None, with_trades: bool = True) -> tuple[list[dict], date, dict]:
+    fc = json.loads((path or DATA / "permits" / "latest.geojson").read_text(encoding="utf-8"))
     rows = []
     for f in fc["features"]:
         p = dict(f["properties"])
+        p["Permit Application Type"] = p.get("Permit Application Type") or "Unknown"
         coords = f["geometry"]["coordinates"] if f.get("geometry") else None
         p["lon"], p["lat"] = (coords if coords else (None, None))
         p["cost"] = p.get("Estimated Cost of Construction") or 0.0
@@ -104,11 +105,17 @@ def load_permits() -> tuple[list[dict], date, dict]:
         p["group"] = permit_group(p)
         p["address"] = pretty_address(p.get("Location"))
         p["neighbourhood"] = p.get("Subdivision Code") or "Unassigned"
-        p["trades"] = trades_for(p)
+        if with_trades:
+            p["trades"] = trades_for(p)
         rows.append(p)
     last = max(r["date"] for r in rows)
     meta = {"source_rows": len(rows), "latest_permit_date": last.isoformat()}
     return rows, last, meta
+
+
+def load_permit_history() -> tuple[list[dict], date, dict]:
+    """Every permit since 2020 (see scraper/permit_history.py), shaped like load_permits()."""
+    return load_permits(DATA / "permit_history" / "latest.geojson", with_trades=False)
 
 
 def window(rows: list[dict], last: date, days: int = WINDOW_DAYS) -> list[dict]:

@@ -14,6 +14,7 @@ from pathlib import Path
 from scraper.enrich import enrich_points
 from scraper.geocode import geocode_all
 from scraper.parcel_match import find_containing_parcel
+from scraper.permit_history import run_permit_history
 from scraper.privacy import business_name
 from scraper.address_points import fetch_address_index
 from scraper.snapshot import diff_features, load_latest, write_snapshot
@@ -287,7 +288,8 @@ def main() -> int:
     try:
         run_proposed_development()  # first: its snapshot archive feeds rezoning-change tracing
         zoning_fc, stats["zoning"] = run_zoning()
-        stats["permits"] = run_permits(zoning_fc)
+        # (the Build Watch 13-month permit file is not needed here, and it carries applicant names)
+        stats["permit_history"] = run_permit_history(zoning_fc)
         run_population()
         run_rental_market()
         run_migration()

@@ -89,9 +89,8 @@ def series(folder: str) -> list[dict]:
 
 def main() -> None:
     OUT.mkdir(exist_ok=True)
-    rows_all, last, _ = o.load_permits()
-    window = o.window(rows_all, last)
-    mp = permits(window)
+    rows_all, last, _ = o.load_permit_history()  # every permit since 2020; the map's date controls pick the slice
+    mp = permits(rows_all)
     zoning = o.zoning_overlay()
     ca = community_layer()
     events = [{
@@ -134,9 +133,14 @@ def main() -> None:
     path = OUT / "regina-data-map.html"
     path.write_text(html, encoding="utf-8")
     total = sum(p["v"] for p in mp)
+    from datetime import timedelta
+    year_start = (last - timedelta(days=364)).isoformat()
+    year = [p for p in mp if p["d"] >= year_start]
     facts = {
-        "built": meta["built"], "permits_through": meta["latest"], "permits_in_window": len(mp), "declared_value_total": total,
-        "neighbourhoods": len({p["n"] for p in mp}), "rezonings_detected": len(events), "open_applications": len(apps),
+        "built": meta["built"], "permits_through": meta["latest"], "history_starts": first.isoformat(),
+        "permits_since_history_start": len(mp), "declared_value_since_history_start": total,
+        "permits_last_12_months": len(year), "declared_value_last_12_months": sum(p["v"] for p in year),
+        "neighbourhoods": len({p["n"] for p in year}), "rezonings_detected": len(events), "open_applications": len(apps),
         "applications_comment_open": sum(1 for a in apps if a["open"]), "population_latest": pop[-1], "rent_latest": rent[-1], "as_of": meta["asof"],
         "size_mb": round(path.stat().st_size / 1e6, 2),
     }
