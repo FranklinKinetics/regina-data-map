@@ -1,0 +1,140 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2011,
+        "Population": 199870,
+        "Release Date": "2025-01-16"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2012,
+        "Population": 205648,
+        "Release Date": "2025-01-16"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2013,
+        "Population": 210562,
+        "Release Date": "2025-01-16"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2014,
+        "Population": 214750,
+        "Release Date": "2025-01-16"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2015,
+        "Population": 218352,
+        "Release Date": "2025-01-16"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2016,
+        "Population": 223296,
+        "Release Date": "2025-01-16"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2017,
+        "Population": 227093,
+        "Release Date": "2025-01-16"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2018,
+        "Population": 230366,
+        "Release Date": "2025-01-16"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2019,
+        "Population": 233224,
+        "Release Date": "2025-01-16"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2020,
+        "Population": 234137,
+        "Release Date": "2025-01-16"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2021,
+        "Population": 233674,
+        "Release Date": "2025-01-16"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2022,
+        "Population": 236282,
+        "Release Date": "2026-01-14"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2023,
+        "Population": 246053,
+        "Release Date": "2026-01-14"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2024,
+        "Population": 257915,
+        "Release Date": "2026-01-14"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2025,
+        "Population": 263419,
+        "Release Date": "2026-01-14"
+      }
+    }
+  ]
+}

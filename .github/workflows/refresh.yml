@@ -1,0 +1,84 @@
+name: Refresh Regina Data Map
+
+# Every Friday morning (the City updates its permit list on Thursdays), and on demand from the Actions tab.
+# 13:30 UTC is 7:30 am in Regina, which does not change its clocks.
+on:
+  schedule:
+    - cron: "30 13 * * 5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      # Downloads the City, Statistics Canada and CMHC data and runs the checks.
+      # If a check fails this step fails, nothing below runs, and the last good data stays live.
+      - name: Download and check the data
+        run: python -m scraper.run
+
+      - name: Build the map
+        env:
+          LAB_OUT_DIR: lab-02
+          LAB_DATA_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/latest-v1.json
+        run: python -m scripts.build_lab_map
+
+      - name: Sanity check the new data file
+        run: |
+          python - <<'PY'
+          import json
+          d = json.load(open("lab-02/latest-v1.json", encoding="utf-8"))
+          assert d["meta"]["schema"] == 1, "unexpected data format"
+          assert len(d["permits"]) > 1000, "too few permits: " + str(len(d["permits"]))
+          assert len(d["zoning"]["features"]) > 10, "zoning missing"
+          print("ok:", len(d["permits"]), "permits through", d["meta"]["latest"])
+          PY
+
+      - name: Remove applicant names and trim saved state
+        run: python -m scripts.prune_state
+
+      - name: Save state for next week
+        run: |
+          git config user.name "regina-data-map bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then echo "no changes to save"; else git commit -m "Weekly refresh $(date -u +%F)" && git push; fi
+
+      - name: Stage the site
+        run: |
+          mkdir site
+          cp lab-02/regina-data-map.html site/index.html
+          cp lab-02/latest-v1.json site/latest-v1.json
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: refresh
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Regina Data Map</title>
+<meta name="description" content="What is being built, rezoned and proposed in Regina, from the City's own open data. Click anything.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@600;700&family=Arimo:wght@400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+/*__LEAFLET_CSS__*/
+:root {
+  --carbon: #211F21; --carbon-2: #2a282b; --steel: #2B424A; --steel-2: #3a5660; --draft: #EDE8E0; --draft-dim: #b9b4ac; --beacon: #ED6B2E;
+  --line: rgba(237, 232, 224, 0.18);
+  --font-display: "Prompt", "Arimo", system-ui, sans-serif; --font-body: "Arimo", system-ui, -apple-system, "Segoe UI", sans-serif; --font-mono: "Space Mono", ui-monospace, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--carbon); color: var(--draft); font: 15px/1.5 var(--font-body); }
+a { color: var(--beacon); }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+button { font: inherit; color: inherit; }
+.app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+header.top { flex: none; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 20px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--steel); }
+header.top h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.01em; }
+header.top .tag { color: var(--draft); opacity: 0.85; font-size: 0.85rem; margin: 0; }
+.mono { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--draft-dim); }
+.brand { color: var(--beacon); }
+html.embedded header.top { display: none; }
+.main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 430px; }
+.mapcol { position: relative; min-height: 0; }
+#map { position: absolute; inset: 0; background: #1a191b; }
+.leaflet-container { font-family: var(--font-body); background: #1a191b; }
+.panel { display: flex; flex-direction: column; min-height: 0; min-width: 0; border-left: 1px solid var(--line); background: var(--carbon-2); }
+.tabs { flex: none; display: flex; border-bottom: 1px solid var(--line); }
+.tabs button { flex: 1; background: none; border: 0; border-bottom: 3px solid transparent; padding: 11px 6px 9px; cursor: pointer; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--draft-dim); }
+.tabs button[aria-selected=true] { color: var(--draft); border-bottom-color: var(--beacon); }
+.tabs button:hover { color: var(--draft); }
+.tabpanel { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 16px 24px; display: flex; flex-direction: column; gap: 18px; }
+.tabpanel[hidden] { display: none; }
+:focus-visible { outline: 2px solid var(--beacon); outline-offset: 2px; }
+.sec h2 { font-size: 0.95rem; margin-bottom: 8px; }
+.sec .hint { font-size: 0.8rem; color: var(--draft-dim); margin: -4px 0 8px; }
+.stories { display: grid; gap: 6px; }
+.story { text-align: left; background: var(--carbon); border: 1px solid var(--line); padding: 9px 12px; cursor: pointer; display: grid; grid-template-columns: 26px 1fr; gap: 0 8px; align-items: start; }
+.story:hover { border-color: var(--beacon); }
+.story[aria-pressed=true] { border-color: var(--beacon); background: var(--steel); }
+.story .n { font-family: var(--font-mono); color: var(--beacon); font-size: 0.8rem; padding-top: 2px; }
+.story b { font-weight: 700; display: block; line-height: 1.3; }
+.story span.s { color: var(--draft-dim); font-size: 0.8rem; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { background: var(--carbon); border: 1px solid var(--line); padding: 9px 14px; cursor: pointer; min-height: 40px; }
+.btn:hover { border-color: var(--beacon); }
+.btn.primary { background: var(--beacon); border-color: var(--beacon); color: #1a0f08; font-weight: 700; }
+.btn.primary:hover { background: #f58450; }
+.fact { border-left: 3px solid var(--beacon); padding: 4px 0 4px 12px; font-size: 0.9rem; margin: 0; }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.stat { border-left: 3px solid var(--beacon); padding-left: 10px; }
+.stat .n { font-family: var(--font-display); font-weight: 700; font-size: 1.4rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.stat .l { font-size: 0.76rem; color: var(--draft-dim); }
+.note { font-size: 0.78rem; color: var(--draft-dim); margin: 8px 0 0; }
+.seg { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); }
+.seg label { position: relative; text-align: center; padding: 8px 4px; font-size: 0.78rem; cursor: pointer; line-height: 1.2; border-left: 1px solid var(--line); }
+.seg label:first-child { border-left: 0; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label:has(input:checked) { background: var(--steel); color: var(--draft); box-shadow: inset 0 -3px 0 var(--beacon); }
+.seg label:has(input:focus-visible) { outline: 2px solid var(--beacon); outline-offset: -2px; }
+.field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 140px; min-width: 0; }
+select, input[type=search] { width: 100%; background: var(--carbon); color: var(--draft); border: 1px solid var(--line); padding: 8px 10px; font: inherit; min-height: 40px; border-radius: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+label.chip { display: inline-flex; align-items: center; gap: 7px; padding: 5px 10px; border: 1px solid var(--line); cursor: pointer; font-size: 0.8rem; background: var(--carbon); min-height: 34px; user-select: none; }
+label.chip input { position: absolute; opacity: 0; pointer-events: none; }
+label.chip .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--c); flex: none; }
+label.chip:has(input:not(:checked)) { opacity: 0.45; }
+label.chip:has(input:not(:checked)) .dot { background: transparent; box-shadow: inset 0 0 0 2px var(--c); }
+label.chip:has(input:focus-visible) { outline: 2px solid var(--beacon); outline-offset: 2px; }
+.toggles { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 10px; font-size: 0.85rem; }
+.toggles label { display: inline-flex; gap: 6px; align-items: center; min-height: 28px; }
+.legend { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 4px 12px; font-size: 0.78rem; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 12px; height: 12px; background: var(--c); flex: none; border: 1px solid var(--line); }
+.legend i.round { border-radius: 50%; background: transparent; border: 3px solid #fff; }
+.legend i.diamond { transform: rotate(45deg); background: var(--beacon); border: 2px solid #fff; width: 10px; height: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+th { font-family: var(--font-mono); font-weight: 400; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--draft-dim); text-align: right; padding: 4px 6px; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th button { all: unset; cursor: pointer; text-transform: inherit; letter-spacing: inherit; }
+th button[aria-pressed=true] { color: var(--beacon); }
+td { padding: 7px 6px; border-top: 1px solid var(--line); text-align: right; vertical-align: top; }
+td:first-child { font-weight: 600; }
+tbody tr { cursor: pointer; }
+tbody tr:hover td { background: rgba(237, 232, 224, 0.06); }
+.bar { height: 5px; background: var(--steel-2); margin-top: 4px; }
+.bar i { display: block; height: 100%; background: var(--beacon); }
+.flag { display: block; color: var(--beacon); font-size: 0.7rem; font-weight: 400; }
+.spot { border: 1px solid var(--beacon); padding: 14px; background: var(--carbon); }
+.spot h3 { font-size: 1.1rem; margin-bottom: 8px; }
+.mix { display: flex; height: 10px; margin: 8px 0 4px; }
+.mix i { display: block; height: 100%; }
+.mixkey { display: flex; flex-wrap: wrap; gap: 2px 12px; font-size: 0.74rem; color: var(--draft-dim); }
+.mixkey b { display: inline-block; width: 9px; height: 9px; margin-right: 4px; border-radius: 50%; }
+.charts { display: grid; gap: 22px; }
+.chart h3 { font-size: 0.92rem; margin-bottom: 2px; }
+.chart p { font-size: 0.78rem; color: var(--draft-dim); margin: 0 0 6px; }
+.chart svg { width: 100%; height: auto; display: block; }
+.chart .ax { fill: var(--draft-dim); font: 10px var(--font-mono); }
+.chart .lb { font: 700 10.5px var(--font-body); }
+details.more-info { border-top: 1px solid var(--line); padding-block: 10px; }
+details.more-info:first-of-type { border-top: 0; }
+details.more-info summary { cursor: pointer; font-weight: 700; min-height: 28px; }
+details.more-info p, details.more-info li { font-size: 0.86rem; margin: 8px 0 0; }
+details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
+.foot { font-size: 0.78rem; color: var(--draft-dim); border-top: 1px solid var(--line); padding-top: 12px; }
+/* map overlays */
+.caption { position: absolute; z-index: 1000; left: 12px; top: 12px; max-width: min(440px, calc(100% - 70px)); background: rgba(33, 31, 33, 0.94); border: 1px solid var(--beacon); padding: 10px 34px 10px 14px; }
+.caption[hidden] { display: none; }
+.caption b { font-family: var(--font-display); display: block; font-size: 0.98rem; line-height: 1.25; }
+.caption p { margin: 4px 0 0; font-size: 0.86rem; }
+.caption button { position: absolute; right: 4px; top: 4px; background: none; border: 0; cursor: pointer; font-size: 1.2rem; line-height: 1; padding: 4px 8px; color: var(--draft-dim); }
+.timebar { position: absolute; z-index: 1000; left: 12px; right: 12px; bottom: 24px; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: center; background: rgba(33, 31, 33, 0.94); border: 1px solid var(--line); padding: 8px 12px; max-width: 640px; }
+.timebar .play { width: 42px; height: 42px; background: var(--beacon); border: 0; color: #1a0f08; font-size: 1.05rem; cursor: pointer; grid-row: span 2; }
+.timebar .play:hover { background: #f58450; }
+.timebar input[type=range] { width: 100%; accent-color: var(--beacon); min-height: 24px; }
+.timebar .tl { display: flex; justify-content: space-between; gap: 12px; font-size: 0.8rem; flex-wrap: wrap; }
+.timebar .tl b { font-family: var(--font-display); }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--carbon); color: var(--draft); border: 1px solid var(--line); border-radius: 0; }
+.leaflet-popup-content { margin: 12px 14px; font-size: 0.85rem; line-height: 1.45; }
+.leaflet-popup-content b.t { font-family: var(--font-display); font-size: 0.95rem; display: block; }
+.pp-v { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: var(--beacon); }
+.pp-m { color: var(--draft-dim); font-size: 0.78rem; }
+.pp-b { margin-top: 8px; background: var(--steel); border: 1px solid var(--line); padding: 6px 10px; cursor: pointer; font-size: 0.8rem; }
+.pp-b:hover { border-color: var(--beacon); }
+.leaflet-container a.leaflet-popup-close-button { color: var(--draft-dim); }
+.leaflet-control-attribution { background: rgba(33, 31, 33, 0.85) !important; color: var(--draft-dim) !important; font-size: 0.65rem; }
+.leaflet-control-attribution a { color: var(--draft) !important; }
+.leaflet-bar a { background: var(--carbon); color: var(--draft); border-bottom-color: var(--line); }
+.road-label { background: none; border: 0; color: rgba(237, 232, 224, 0.85); font: 600 0.62rem var(--font-body); text-shadow: 0 0 3px #1a191b, 0 0 3px #1a191b, 0 0 2px #1a191b; white-space: nowrap; pointer-events: none; transform: translate(-50%, -50%); }
+.road-label.major { font-size: 0.7rem; color: #fff; }
+.mk-rezone { width: 16px; height: 16px; background: var(--beacon); border: 2px solid #fff; transform: rotate(45deg); }
+.mk-app { width: 18px; height: 18px; border: 3px solid #fff; border-radius: 50%; background: rgba(33, 31, 33, 0.5); }
+.mk-app.open { background: var(--beacon); }
+@media (max-width: 860px) {
+  .main { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(280px, 50%) minmax(0, 1fr); }
+  .panel { border-left: 0; border-top: 1px solid var(--line); }
+  .timebar { bottom: 34px; left: 8px; right: 8px; padding: 5px 8px; gap: 2px 10px; }
+  .timebar .play { width: 36px; height: 36px; }
+  .timebar .tl { font-size: 0.72rem; }
+  .caption { left: 8px; right: 8px; top: 8px; max-width: none; padding: 7px 30px 7px 10px; }
+  .caption b { font-size: 0.88rem; }
+  .caption p { font-size: 0.78rem; margin-top: 2px; }
+  header.top { padding: 6px 12px; }
+  header.top h1 { font-size: 1.05rem; }
+  header.top .tag, header.top .mono { display: none; }
+  .tabs button { font-size: 0.64rem; padding: 9px 2px 7px; }
+  .leaflet-control-attribution { font-size: 0.58rem; max-width: 70%; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div><h1>Regina Data Map</h1><p class="tag">What is being built, rezoned and proposed in Regina. Click anything.</p></div>
+    <div class="mono"><span class="brand">Franklin Kinetics</span> &middot; Lab 02 &middot; permits through <b id="st-latest" style="color:var(--draft);font-weight:400"></b><span id="st-fresh"></span></div>
+  </header>
+  <div class="main">
+    <section class="mapcol" aria-label="Map">
+      <div id="map" role="application" aria-label="Map of Regina building permits, zoning and proposed development. The Places tab lists the same permits by neighbourhood."></div>
+      <div class="caption" id="caption" hidden role="status" aria-live="polite"><b id="cap-t"></b><p id="cap-p"></p><button type="button" id="cap-x" aria-label="Close">&times;</button></div>
+      <div class="timebar" aria-label="Time-lapse">
+        <button type="button" class="play" id="play" aria-label="Play the time-lapse">&#9654;</button>
+        <input type="range" id="slider" min="0" max="364" value="364" aria-label="Show permits issued up to this date">
+        <div class="tl"><span>Through <b id="tb-date"></b></span><span id="tb-count"></span></div>
+      </div>
+    </section>
+    <aside class="panel" aria-label="Controls and facts">
+      <div class="tabs" role="tablist" aria-label="Sections">
+        <button type="button" role="tab" id="tab-explore" aria-selected="true" aria-controls="p-explore">Explore</button>
+        <button type="button" role="tab" id="tab-places" aria-selected="false" aria-controls="p-places" tabindex="-1">Places</button>
+        <button type="button" role="tab" id="tab-numbers" aria-selected="false" aria-controls="p-numbers" tabindex="-1">Regina in numbers</button>
+        <button type="button" role="tab" id="tab-about" aria-selected="false" aria-controls="p-about" tabindex="-1">About</button>
+      </div>
+
+      <div class="tabpanel" id="p-explore" role="tabpanel" aria-labelledby="tab-explore">
+        <div class="sec"><h2>Pick a story</h2><p class="hint">One click sets up the map for you.</p>
+          <div class="stories" id="stories"></div>
+          <div class="row" style="margin-top:10px">
+            <button type="button" class="btn primary" id="surprise">Surprise me</button>
+            <button type="button" class="btn" id="play2">Watch the year build up</button>
+            <button type="button" class="btn" id="reset">Reset</button>
+          </div>
+        </div>
+        <div class="sec"><h2>Did you know?</h2><p class="fact" id="fact"></p><div class="row" style="margin-top:8px"><button type="button" class="btn" id="fact-next">Another fact</button></div></div>
+        <div class="sec"><h2>What the map shows right now</h2>
+          <div class="stats">
+            <div class="stat"><div class="n" id="s-permits">&ndash;</div><div class="l">permits issued</div></div>
+            <div class="stat"><div class="n" id="s-value">&ndash;</div><div class="l">declared construction value</div></div>
+            <div class="stat"><div class="n" id="s-units">&ndash;</div><div class="l">new homes permitted</div></div>
+            <div class="stat"><div class="n" id="s-median">&ndash;</div><div class="l">median permit</div></div>
+          </div>
+          <p class="note" id="s-note"></p>
+        </div>
+        <div class="sec"><h2>Shade the map by</h2>
+          <div class="seg" id="shade" role="radiogroup" aria-label="Shade the map by">
+            <label><input type="radio" name="shade" value="zoning" checked>Zoning</label>
+            <label><input type="radio" name="shade" value="income">Income</label>
+            <label><input type="radio" name="shade" value="shelter">Housing costs</label>
+            <label><input type="radio" name="shade" value="building">Building per person</label>
+          </div>
+          <div class="legend" id="legend" style="margin-top:10px"></div>
+          <p class="note" id="shade-note"></p>
+        </div>
+        <div class="sec"><h2>Filter the dots</h2>
+          <div class="row">
+            <div class="field"><label class="mono" for="f-days">Issued in the last</label><select id="f-days"><option value="30">30 days</option><option value="90">90 days</option><option value="365" selected>12 months</option></select></div>
+            <div class="field"><label class="mono" for="f-value">Declared value</label><select id="f-value"><option value="0">Any value</option><option value="50000">$50,000 and up</option><option value="250000">$250,000 and up</option><option value="1000000">$1 million and up</option><option value="10000000">$10 million and up</option></select></div>
+            <div class="field"><label class="mono" for="f-hood">Neighbourhood</label><select id="f-hood"><option value="">All neighbourhoods</option></select></div>
+            <div class="field"><label class="mono" for="f-q">Address or type of work</label><input type="search" id="f-q" placeholder="e.g. Westerra, laneway" autocomplete="off"></div>
+          </div>
+          <div class="chips" id="chips"></div>
+          <div class="toggles">
+            <label><input type="checkbox" id="t-permits" checked> Permits</label>
+            <label><input type="checkbox" id="t-events" checked> Rezonings and open applications</label>
+            <label><input type="checkbox" id="t-roads" checked> Streets and names</label>
+          </div>
+          <div class="legend" style="margin-top:10px"><span><i class="diamond"></i> Rezoning spotted</span><span><i class="round" style="background:var(--beacon)"></i> City application open for comment</span><span><i class="round"></i> Other City application</span></div>
+          <p class="note">Dot size follows declared value. Dot colour follows the type of work.</p>
+          <div class="row" style="margin-top:10px"><button type="button" class="btn" id="copy">Copy a link to this view</button><a class="btn" id="full" href="#" target="_blank" rel="noopener" hidden>Open full screen</a></div>
+        </div>
+      </div>
+
+      <div class="tabpanel" id="p-places" role="tabpanel" aria-labelledby="tab-places" hidden>
+        <div class="sec" id="spot-wrap" hidden></div>
+        <div class="sec"><h2>Neighbourhoods</h2><p class="hint">Click a row to zoom in and get its story. The numbers follow your filters.</p>
+          <table>
+            <thead><tr><th scope="col">Neighbourhood</th><th scope="col"><button type="button" data-sort="permits" aria-pressed="false">Permits</button></th><th scope="col"><button type="button" data-sort="value" aria-pressed="true">Value</button></th><th scope="col"><button type="button" data-sort="median" aria-pressed="false">Median</button></th></tr></thead>
+            <tbody id="hood-body"></tbody>
+          </table>
+          <div class="row" style="margin-top:10px"><button type="button" class="btn" id="hood-more">Show all</button></div>
+          <p class="note">Where one project is more than 40% of a neighbourhood's total, the row says so, because one big permit can make an area look busier than it is.</p>
+        </div>
+      </div>
+
+      <div class="tabpanel" id="p-numbers" role="tabpanel" aria-labelledby="tab-numbers" hidden>
+        <div class="sec"><h2>Regina in numbers</h2><p class="hint">The bigger picture behind the permits. Federal statistics and CMHC.</p></div>
+        <div class="charts" id="charts"></div>
+      </div>
+
+      <div class="tabpanel" id="p-about" role="tabpanel" aria-labelledby="tab-about" hidden>
+        <div class="sec"><h2>How to read this map</h2>
+          <details class="more-info" open><summary>What a building permit is</summary><p>The City issues a permit before most construction, demolition or major renovation can start. Each dot is one permit at the property it covers. A permit means the work is approved to begin. It does not mean the work is finished, or that it will go ahead on the declared budget.</p></details>
+          <details class="more-info"><summary>What "declared value" means</summary><p>The applicant's own estimate of construction cost when they apply. It is not an appraisal, a sale price or the final cost. Some projects are declared in stages, so one building can appear in more than one permit.</p></details>
+          <details class="more-info"><summary>Zoning, rezonings and open applications</summary><p>Zoning sets what can be built on land. "Urban holding" land is set aside for future development and usually needs a rezoning first. Diamonds mark places where the City's zoning map changed since our first snapshot. Circles are applications the City currently lists on its Proposed Development page; orange ones are open for public comment.</p></details>
+          <details class="more-info"><summary>Income and housing-cost shading</summary><p>These come from the 2021 Census (Statistics Canada). The Census does not publish figures for community associations, so each figure is an estimate built from the census blocks that overlap each area. Treat it as a good guide, not a precise count.</p></details>
+          <details class="more-info"><summary>Known gaps</summary><ul id="gaps"></ul></details>
+        </div>
+        <div class="sec"><h2>Where the data comes from</h2><ul id="sources" style="padding-left:18px;margin:0;font-size:0.86rem"></ul></div>
+        <p class="foot" id="foot"></p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>/*__LEAFLET_JS__*/</script>
+<script type="application/json" id="data">/*__DATA__*/</script>
+<script>
+(function () {
+  "use strict";
+  const DATA_URL = "/*__DATA_URL__*/"; // where the newest data lives; blank = use only the data inside this file
+  const BUILT_IN = JSON.parse(document.getElementById("data").textContent);
+  document.getElementById("st-latest").textContent = "checking for newer data";
+  fetchNewer(BUILT_IN).then((fresh) => boot(fresh || BUILT_IN, !!fresh));
+
+  // Ask the data host for a newer copy. Offline, blocked, a bad reply or an older copy all fall back to the data inside this file.
+  function fetchNewer(cur) {
+    if (!DATA_URL || !window.fetch) return Promise.resolve(null);
+    const ctl = window.AbortController ? new AbortController() : null;
+    const timer = setTimeout(() => { if (ctl) ctl.abort(); }, 6000);
+    return fetch(DATA_URL, { cache: "no-cache", signal: ctl ? ctl.signal : undefined })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => (d && d.meta && d.meta.schema === cur.meta.schema && d.meta.built > cur.meta.built && d.meta.latest >= cur.meta.latest &&
+        Array.isArray(d.permits) && d.permits.length > 100 && d.zoning && d.communities && d.series) ? d : null)
+      .catch(() => null)
+      .then((d) => { clearTimeout(timer); return d; });
+  }
+
+  function boot(D, live) {
+  const M = D.meta, A = M.asof;
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const money = (v) => "$" + Math.round(v).toLocaleString("en-CA");
+  const compact = (v) => v >= 1e9 ? "$" + (v / 1e9).toFixed(2) + " billion" : v >= 1e6 ? "$" + (v / 1e6).toFixed(1) + " million" : v >= 1e3 ? "$" + Math.round(v / 1e3) + "K" : "$" + Math.round(v);
+  const short = (v) => v >= 1e9 ? "$" + (v / 1e9).toFixed(2) + "B" : v >= 1e6 ? "$" + (v / 1e6).toFixed(1) + "M" : v >= 1e3 ? "$" + Math.round(v / 1e3) + "K" : "$" + Math.round(v);
+  const num = (v) => Math.round(v).toLocaleString("en-CA");
+  const fmtDate = (iso) => new Date(iso + "T12:00:00").toLocaleDateString("en-CA", { year: "numeric", month: "short", day: "numeric" });
+  const median = (a) => { if (!a.length) return 0; const s = a.slice().sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+  const DAY = 86400000;
+  const addDays = (iso, n) => new Date(new Date(iso + "T12:00:00").getTime() + n * DAY).toISOString().slice(0, 10);
+  const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const embedded = window.self !== window.top;
+  if (location.protocol === "file:") $("copy").hidden = true; // a saved copy has no shareable address
+  if (embedded) { document.documentElement.classList.add("embedded"); $("full").hidden = false; $("full").href = location.href.split("#")[0]; }
+
+  const GROUP_COLOR = { "new-homes": "#56B4E9", "new-multi": "#2FCB9A", "new-commercial": "#F0E442", "commercial-reno": "#E69F00", "suites": "#CC79A7", "home-work": "#9AA5B1", "other": "#6B7078" };
+  const GROUP_LABEL = Object.fromEntries(M.groups.map((g) => [g.key, g.label]));
+  const ZONE_COLOR = { "Residential": "#4E7C8C", "Mixed-use and commercial": "#8A6FA8", "Industrial": "#9C7A4D", "Public and institutional": "#5E8C61",
+    "Urban holding (future development)": "#6D6D72", "Direct control district": "#A86B7E", "Other": "#5a5a5f" };
+  const RAMP = ["#34474e", "#5b6a63", "#8f7a52", "#c67a3a", "#ED6B2E"];
+  const SHADES = {
+    income: { field: "income", cuts: [60000, 80000, 100000, 120000], labels: ["Under $60K", "$60K to $80K", "$80K to $100K", "$100K to $120K", "$120K and up"],
+      note: "Estimated median household income by community association, 2021 Census (Statistics Canada). Click an area for its figures." },
+    shelter: { field: "shelter", cuts: [15, 20, 25, 30], labels: ["Under 15%", "15% to 20%", "20% to 25%", "25% to 30%", "30% and up"],
+      note: "Share of households spending 30% or more of income on housing, 2021 Census (Statistics Canada), estimated by community association." },
+    building: { note: "Declared construction value of the permits showing, divided by each area's 2021 population. Darker is quieter, orange is busier. The ranking follows your filters and the time-lapse." },
+  };
+  const state = { days: 365, t: 364, min: 0, hood: "", q: "", groups: new Set(M.groups.map((g) => g.key)), shade: "zoning", sort: "value", showAll: false, story: "", fact: 0 };
+  const win = { start: addDays(M.latest, -364), upTo: M.latest };
+
+  $("st-latest").textContent = fmtDate(M.latest);
+  $("st-fresh").textContent = live ? " · updated just now" : "";
+  $("foot").innerHTML = esc(M.attribution) + " Made by Franklin Kinetics, Regina. This map is not a City of Regina service and the City has not endorsed it. Figures are information, not advice, and may contain errors.";
+  $("sources").innerHTML = [
+    "City of Regina, Building Permit Report. Permits issued " + fmtDate(A.permits_start) + " to " + fmtDate(A.permits) + "; the map shows the 12 months ending " + fmtDate(M.latest) + ". Updated by the City each Thursday.",
+    "City of Regina Open Data: Zoning and Land Use districts (snapshot " + fmtDate(A.zoning) + "), Road Centerline, Address Points, Parcels and Community Associations (ArcGIS open data services).",
+    "City of Regina, Proposed Development notices (snapshot " + fmtDate(A.applications) + "). Rezonings are spotted by comparing the City's own zoning snapshots, so only changes since " + fmtDate("2026-07-26") + " show.",
+    "Statistics Canada: population estimates for July 1, " + A.population_year + " (Table 17-10-0155-01, released " + fmtDate(A.population) + "); components of population change to " + A.migration_year + " (Table 17-10-0149-01); 2021 Census income and shelter-cost data.",
+    "Canada Mortgage and Housing Corporation (CMHC), Rental Market Survey, Regina, to " + A.rent_year + ".",
+  ].map((s) => "<li>" + esc(s) + "</li>").join("");
+  $("gaps").innerHTML = [
+    M.unplotted + " of " + num(M.total_permits) + " permits could not be matched to a City address point. They are counted in totals and tables but not drawn.",
+    "Permit values are declared estimates, and a few very large permits can dominate an area's total.",
+    "The City's zoning district map and its parcel layer sometimes disagree about a property's zone (about 15% of permits). The map uses the district map.",
+    "Permits are listed when issued. Work done without a permit, or outside the city limits, is not included. The City publishes weekly, so the newest days are missing.",
+    "Names of people and companies are left out on purpose: this map is about places and projects.",
+  ].map((s) => "<li>" + esc(s) + "</li>").join("");
+
+  // ---------------------------------------------------------------- controls
+  $("chips").innerHTML = M.groups.map((g) => '<label class="chip" style="--c:' + GROUP_COLOR[g.key] + '"><input type="checkbox" value="' + g.key + '" checked><span class="dot"></span>' + esc(g.label) + "</label>").join("");
+  const hoodNames = Array.from(new Set(D.permits.map((p) => p.n))).sort((a, b) => a.localeCompare(b));
+  $("f-hood").innerHTML += hoodNames.map((n) => '<option value="' + esc(n) + '">' + esc(n) + "</option>").join("");
+
+  // ---------------------------------------------------------------- map
+  const map = L.map("map", { zoomControl: true, preferCanvas: true, minZoom: 10, maxZoom: 18, zoomSnap: 0.25 });
+  map.attributionControl.setPrefix(false);
+  map.attributionControl.addAttribution("Open Government Licence &ndash; City of Regina &middot; Statistics Canada &middot; CMHC");
+  const bnd = M.bounds;
+  const fitCity = () => map.fitBounds([[bnd[1], bnd[0]], [bnd[3], bnd[2]]], { animate: !reduced });
+  fitCity();
+  map.setMaxBounds([[bnd[1] - 0.15, bnd[0] - 0.25], [bnd[3] + 0.15, bnd[2] + 0.25]]);
+  map.createPane("shade").style.zIndex = 300;
+  map.createPane("roads").style.zIndex = 350;
+
+  const zoningLayer = L.geoJSON(D.zoning, {
+    renderer: L.canvas({ pane: "shade" }),
+    style: (f) => ({ color: "#EDE8E0", weight: 0.6, opacity: 0.35, fillColor: ZONE_COLOR[f.properties.cat] || ZONE_COLOR.Other, fillOpacity: 0.5 }),
+    onEachFeature: (f, layer) => layer.on("click", (e) => {
+      const p = f.properties;
+      L.popup().setLatLng(e.latlng).setContent('<b class="t">' + esc(p.name || p.c) + '</b><span class="pp-m">Zoning code ' + esc(p.c || "none") + " &middot; " + esc(p.cat) + "</span>" +
+        (p.plain ? "<p style='margin:6px 0 0'>" + esc(p.plain) + "</p>" : "")).openOn(map);
+    }),
+  });
+  const caLayer = L.geoJSON(D.communities, {
+    renderer: L.canvas({ pane: "shade" }),
+    style: () => ({ color: "#EDE8E0", weight: 1, opacity: 0.55, fillColor: "#444", fillOpacity: 0.62 }),
+    onEachFeature: (f, layer) => layer.on("click", (e) => L.popup().setLatLng(e.latlng).setContent(caPopup(f.properties)).openOn(map)),
+  });
+  const roadRenderer = L.canvas({ pane: "roads" });
+  const roadStyle = { major: { weight: 2.6, opacity: 0.8 }, collector: { weight: 1.5, opacity: 0.55 }, local: { weight: 0.8, opacity: 0.32 } };
+  const roadLayer = L.layerGroup(Object.entries(D.roads.tiers).map(([tier, lines]) =>
+    L.polyline(lines.map((l) => l.map((c) => [c[1], c[0]])), Object.assign({ renderer: roadRenderer, color: "#d9d2c5", interactive: false, lineJoin: "round" }, roadStyle[tier]))));
+  const roadNames = { major: L.layerGroup(), collector: L.layerGroup() };
+  D.roads.labels.forEach((r) => roadNames[r.t].addLayer(L.marker([r.y, r.x], { interactive: false, keyboard: false, icon: L.divIcon({ className: "road-label " + r.t, html: esc(r.n), iconSize: [0, 0] }) })));
+  const syncRoadNames = () => {
+    const on = $("t-roads").checked, z = map.getZoom();
+    [["major", 13], ["collector", 15]].forEach(([t, minZ]) => (on && z >= minZ ? roadNames[t].addTo(map) : map.removeLayer(roadNames[t])));
+  };
+  map.on("zoomend", syncRoadNames);
+  roadLayer.addTo(map);
+
+  // permits
+  const canvas = L.canvas({ padding: 0.4 });
+  const permitLayer = L.layerGroup().addTo(map);
+  const radius = (v) => Math.max(2.5, Math.min(15, 1.8 + Math.sqrt(v) / 200));
+  const WHAT = { "Single/Semi-Detached Dwelling 1-2 units": "new home", "Multi-Unit Dwelling 3+ Units": "new apartment or townhouse building", "New Commercial": "new commercial building",
+    "Addition": "addition", "Renovation/Alteration": "renovation", "Secondary Suite": "secondary suite", "Basement Development": "basement development", "Backyard/Laneway Suite": "backyard or laneway suite", "Demolition": "demolition" };
+  const what = (p) => WHAT[p.t] || String(p.t || "permit").toLowerCase();
+  const article = (s) => (/^[aeiou]/i.test(s) ? "an " : "a ");
+  const markers = D.permits.filter((p) => p.lon != null).map((p) => {
+    const m = L.circleMarker([p.lat, p.lon], { renderer: canvas, radius: radius(p.v), color: "#15130f", weight: 0.6, fillColor: GROUP_COLOR[p.g], fillOpacity: 0.85, bubblingMouseEvents: false });
+    m.p = p; m._shown = false;
+    m.on("click", () => L.popup({ maxWidth: 290 }).setLatLng([p.lat, p.lon]).setContent(permitPopup(p)).openOn(map));
+    return m;
+  }).sort((a, c) => c.p.v - a.p.v);
+  function permitPopup(p) {
+    return '<b class="t">' + esc(p.a) + '</b><span class="pp-m">' + esc(p.n) + "</span>" +
+      '<div class="pp-v">' + money(p.v) + "</div><div>" + esc(cap1(what(p))) + (p.u ? " &middot; " + esc(p.u) : "") + (p.units ? " &middot; " + p.units + " unit" + (p.units > 1 ? "s" : "") : "") + "</div>" +
+      '<div class="pp-m">Issued ' + fmtDate(p.d) + " &middot; Permit " + esc(p.id) + (p.z ? " &middot; Zoned " + esc(p.z) : "") + "</div>" +
+      '<button type="button" class="pp-b" data-spot="' + esc(p.n) + '">Explore ' + esc(p.n) + "</button>";
+  }
+  const cap1 = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+  // rezonings and applications
+  const eventLayer = L.layerGroup();
+  D.rezonings.forEach((r) => {
+    const m = L.marker([r.lat, r.lon], { icon: L.divIcon({ className: "", html: '<div class="mk-rezone"></div>', iconSize: [16, 16] }), keyboard: true, title: "Rezoning near " + r.address });
+    const apps = (r.apps || []).map((a) => "<div style='margin-top:6px'><span class='pp-m'>" + esc(a.file) + " &middot; " + esc(a.type) + "</span><br>" + esc(a.desc) + "</div>").join("");
+    m.bindPopup('<b class="t">Rezoned: ' + esc(r.from || "?") + " to " + esc(r.to) + '</b><span class="pp-m">' + esc(r.to_desc) + " &middot; near " + esc(r.address) + (r.area ? " &middot; " + esc(r.area) : "") + "</span>" +
+      "<div class='pp-m'>Bylaw " + esc(r.bylaw || "not listed") + ". Appeared in the City's zoning map between " + fmtDate(r.baseline) + " and " + fmtDate(r.detected) + ". The exact date is not published.</div>" + apps);
+    eventLayer.addLayer(m);
+  });
+  D.applications.forEach((a) => {
+    if (a.lon == null) return;
+    const m = L.marker([a.lat, a.lon], { icon: L.divIcon({ className: "", html: '<div class="mk-app' + (a.open ? " open" : "") + '"></div>', iconSize: [18, 18] }), title: "Application at " + a.address });
+    m.bindPopup('<b class="t">' + esc(a.address) + '</b><span class="pp-m">' + esc(a.file) + " &middot; " + esc(a.type) + "</span><div>" + esc(a.desc) + "</div>" +
+      "<div class='pp-m'>" + esc(a.status) + "</div>" + (a.notice ? "<div style='margin-top:6px'><a href='" + esc(a.notice) + "' target='_blank' rel='noopener'>City public notice</a></div>" : ""));
+    eventLayer.addLayer(m);
+  });
+  eventLayer.addTo(map);
+
+  // ---------------------------------------------------------------- shading
+  let caStats = {};
+  const caByKey = Object.fromEntries(D.communities.features.map((f) => [f.properties.key, f.properties]));
+  function caPopup(p) {
+    const s = caStats[p.key] || { n: 0, v: 0 };
+    return '<b class="t">' + esc(p.name) + '</b><span class="pp-m">Community association &middot; about ' + num(p.pop || 0) + " people (2021)</span>" +
+      "<div style='margin-top:6px'>Median household income <b>" + (p.income ? money(p.income) : "n/a") + "</b><br>Spending 30%+ of income on housing <b>" + (p.shelter != null ? p.shelter + "%" : "n/a") + "</b></div>" +
+      "<div class='pp-m'>Estimates from the 2021 Census.</div><div style='margin-top:6px'>Permits showing: <b>" + num(s.n) + "</b> worth <b>" + short(s.v) + "</b></div>";
+  }
+  function binColor(v, cuts) { if (v == null) return "#3b3b3f"; let i = 0; while (i < cuts.length && v >= cuts[i]) i++; return RAMP[i]; }
+  function restyleShade() {
+    const mode = state.shade;
+    if (mode === "zoning") { map.removeLayer(caLayer); zoningLayer.addTo(map); }
+    else { map.removeLayer(zoningLayer); caLayer.addTo(map); }
+    let cuts = null, perPerson = {};
+    if (mode === "building") {
+      const vals = D.communities.features.map((f) => { const p = f.properties, s = caStats[p.key]; return p.pop && s ? s.v / p.pop : 0; });
+      D.communities.features.forEach((f, i) => { perPerson[f.properties.key] = vals[i]; });
+      const sorted = vals.slice().sort((a, b) => a - b);
+      cuts = [0.2, 0.4, 0.6, 0.8].map((q) => sorted[Math.floor(q * (sorted.length - 1))]);
+    }
+    if (mode !== "zoning") {
+      caLayer.setStyle((f) => {
+        const p = f.properties; let v;
+        if (mode === "building") return { fillColor: binColor(perPerson[p.key], cuts), fillOpacity: 0.7 };
+        v = p[SHADES[mode].field]; return { fillColor: binColor(v, SHADES[mode].cuts), fillOpacity: 0.7 };
+      });
+    }
+    const lg = $("legend");
+    if (mode === "zoning") lg.innerHTML = Object.keys(ZONE_COLOR).filter((k) => D.zoning.features.some((f) => f.properties.cat === k)).map((k) => '<span><i style="--c:' + ZONE_COLOR[k] + '"></i>' + esc(k) + "</span>").join("");
+    else if (mode === "building") lg.innerHTML = ["Quietest fifth", "", "Middle", "", "Busiest fifth"].map((l, i) => '<span><i style="--c:' + RAMP[i] + '"></i>' + esc(l || (i === 1 ? "Quieter" : "Busier")) + "</span>").join("");
+    else lg.innerHTML = SHADES[mode].labels.map((l, i) => '<span><i style="--c:' + RAMP[i] + '"></i>' + esc(l) + "</span>").join("");
+    $("shade-note").textContent = mode === "zoning" ? "Shaded areas are the City's zoning districts. Click one to see its zone in plain language." : SHADES[mode].note;
+  }
+
+  // ---------------------------------------------------------------- filtering and drawing
+  function passes(p) {
+    if (!state.groups.has(p.g)) return false;
+    if (p.v < state.min) return false;
+    if (state.hood && p.n !== state.hood) return false;
+    if (p.d < win.start || p.d > win.upTo) return false;
+    if (state.q && !((p.a + " " + p.n + " " + p.t + " " + what(p)).toLowerCase().includes(state.q))) return false;
+    return true;
+  }
+  let current = [], lastRecent = [];
+  function refresh() {
+    win.start = addDays(M.latest, -(state.days - 1));
+    win.upTo = addDays(win.start, state.t);
+    current = D.permits.filter(passes);
+    const showPermits = $("t-permits").checked;
+    lastRecent.forEach((m) => m.setStyle({ weight: 0.6, color: "#15130f" })); lastRecent = [];
+    markers.forEach((m) => {
+      const should = showPermits && passes(m.p);
+      if (should && !m._shown) { permitLayer.addLayer(m); m._shown = true; if (playing) { m.setStyle({ weight: 2.2, color: "#ffffff" }); lastRecent.push(m); } }
+      else if (!should && m._shown) { permitLayer.removeLayer(m); m._shown = false; }
+    });
+    caStats = {};
+    current.forEach((p) => { if (p.ca) { const s = caStats[p.ca] || (caStats[p.ca] = { n: 0, v: 0 }); s.n++; s.v += p.v; } });
+    const vals = current.map((p) => p.v), total = vals.reduce((a, c) => a + c, 0);
+    $("s-permits").textContent = num(current.length);
+    $("s-value").textContent = short(total);
+    $("s-median").textContent = current.length ? money(median(vals)) : "–";
+    $("s-units").textContent = num(newUnits(current));
+    const unplotted = current.filter((p) => p.lon == null).length, big = current.slice().sort((x, y) => y.v - x.v)[0];
+    $("s-note").textContent = (unplotted ? unplotted + " of these permits have no exact map location and are counted but not drawn. " : "") +
+      (big && total && big.v / total > 0.1 ? "The largest permit (" + big.a + ", " + short(big.v) + ") is " + Math.round(100 * big.v / total) + "% of this total." : "");
+    $("tb-date").textContent = fmtDate(win.upTo);
+    $("tb-count").innerHTML = "<b>" + num(current.length) + "</b> permits &middot; <b>" + short(total) + "</b>";
+    $("slider").max = state.days - 1; $("slider").value = state.t;
+    restyleShade(); renderHoods(); renderSpot(); writeHash();
+  }
+  const newUnits = (rs) => rs.filter((p) => p.g === "new-homes" || p.g === "new-multi").reduce((a, c) => a + (c.t === "Backyard/Laneway Suite" ? 0 : c.units), 0);
+
+  function renderHoods() {
+    const by = {};
+    current.forEach((p) => { (by[p.n] || (by[p.n] = [])).push(p); });
+    const rows = Object.entries(by).map(([n, ps]) => {
+      const vs = ps.map((p) => p.v), total = vs.reduce((a, c) => a + c, 0), top = ps.reduce((a, c) => (c.v > a.v ? c : a));
+      return { n, permits: ps.length, value: total, median: median(vs), share: total ? top.v / total : 0 };
+    }).sort((a, c) => c[state.sort] - a[state.sort]);
+    const shown = state.showAll ? rows : rows.slice(0, 12), max = Math.max(1, ...shown.map((r) => r.value));
+    $("hood-body").innerHTML = shown.map((r) => '<tr tabindex="0" data-n="' + esc(r.n) + '"><td>' + esc(r.n) + (r.share > 0.4 && r.permits > 1 ? '<span class="flag">one project is ' + Math.round(r.share * 100) + "% of this</span>" : "") +
+      "</td><td>" + r.permits + "</td><td>" + short(r.value) + '<div class="bar"><i style="width:' + Math.max(2, 100 * r.value / max) + '%"></i></div></td><td>' + short(r.median) + "</td></tr>").join("") || '<tr><td colspan="4">No permits match these filters.</td></tr>';
+    $("hood-more").hidden = rows.length <= 12;
+    $("hood-more").textContent = state.showAll ? "Show top 12" : "Show all " + rows.length;
+  }
+
+  function renderSpot() {
+    const w = $("spot-wrap");
+    if (!state.hood) { w.hidden = true; w.innerHTML = ""; return; }
+    const all = D.permits.filter((p) => p.n === state.hood), mine = current;
+    const total = mine.reduce((a, c) => a + c.v, 0), top = mine.slice().sort((x, y) => y.v - x.v)[0];
+    const ranks = {}; current.forEach((p) => { ranks[p.n] = (ranks[p.n] || 0) + p.v; });
+    const caCount = {}; all.forEach((p) => { if (p.ca) caCount[p.ca] = (caCount[p.ca] || 0) + 1; });
+    const caKey = Object.keys(caCount).sort((a, b) => caCount[b] - caCount[a])[0], ca = caKey && caByKey[caKey];
+    const mixCount = {}; mine.forEach((p) => { mixCount[p.g] = (mixCount[p.g] || 0) + 1; });
+    const mix = M.groups.filter((g) => mixCount[g.key]);
+    w.hidden = false;
+    w.innerHTML = '<div class="spot"><p class="mono" style="margin:0 0 4px">Neighbourhood spotlight</p><h3>' + esc(state.hood) + "</h3>" +
+      '<div class="stats"><div class="stat"><div class="n">' + num(mine.length) + '</div><div class="l">permits</div></div><div class="stat"><div class="n">' + short(total) + '</div><div class="l">declared value</div></div>' +
+      '<div class="stat"><div class="n">' + num(newUnits(mine)) + '</div><div class="l">new homes</div></div><div class="stat"><div class="n">' + (mine.length ? short(median(mine.map((p) => p.v))) : "–") + '</div><div class="l">median permit</div></div></div>' +
+      (mine.length ? '<p class="note" style="margin-top:10px">What is being built (by number of permits)</p><div class="mix">' + mix.map((g) => '<i style="width:' + (100 * mixCount[g.key] / mine.length) + "%;background:" + GROUP_COLOR[g.key] + '" title="' + esc(g.label) + '"></i>').join("") + '</div><div class="mixkey">' +
+        mix.map((g) => '<span><b style="background:' + GROUP_COLOR[g.key] + '"></b>' + esc(g.label) + " " + mixCount[g.key] + "</span>").join("") + "</div>" : "") +
+      (top ? '<p style="margin:12px 0 0">Biggest project showing: <b>' + esc(top.a) + "</b>, " + esc(what(top)) + ", " + short(top.v) + ' <button type="button" class="pp-b" data-find="' + esc(top.id) + '">Show on map</button></p>' : "") +
+      (ca && ca.income ? '<p class="note" style="margin-top:10px">Part of the ' + esc(ca.name) + " community area (2021 Census, estimated): median household income " + money(ca.income) + (ca.shelter != null ? "; " + ca.shelter + "% of households spend 30% or more of income on housing" : "") + ".</p>" : "") +
+      '<div class="row" style="margin-top:10px"><button type="button" class="btn" id="spot-clear">Back to the whole city</button></div></div>';
+    $("spot-clear").addEventListener("click", () => { setHood(""); fitCity(); });
+  }
+  function setHood(n) { state.hood = n; $("f-hood").value = n; refresh(); }
+  function spotlight(n) {
+    state.story = ""; storyButtons();
+    state.hood = n; $("f-hood").value = n; showTab("places"); refresh();
+    const pts = D.permits.filter((p) => p.n === n && p.lon != null).map((p) => [p.lat, p.lon]);
+    if (pts.length) map.fitBounds(L.latLngBounds(pts).pad(0.2), { maxZoom: 15, animate: !reduced });
+    hideCaption();
+  }
+
+  // ---------------------------------------------------------------- stories, surprise, facts
+  let introTimer = null;
+  const caption = (t, p) => { clearTimeout(introTimer); $("cap-t").textContent = t; $("cap-p").textContent = p; $("caption").hidden = false; };
+  const hideCaption = () => { $("caption").hidden = true; };
+  $("cap-x").addEventListener("click", hideCaption);
+  function topBy(rs, keyFn, valFn) { const by = {}; rs.forEach((p) => { by[keyFn(p)] = (by[keyFn(p)] || 0) + valFn(p); }); const e = Object.entries(by).sort((a, b) => b[1] - a[1])[0]; return e || ["", 0]; }
+  const STORIES = [
+    { id: "homes", t: "Where are new homes going up?", s: "New houses, apartments and townhouses", groups: ["new-homes", "new-multi"],
+      cap: (c) => { const u = newUnits(c), [h, hu] = topBy(c.filter((p) => p.t !== "Backyard/Laneway Suite"), (p) => p.n, (p) => p.units);
+        return [c.length + " permits for new homes and apartment buildings", "Together they add about " + num(u) + " homes. The most: " + (h || "none") + " (" + num(hu) + "). Click a dot to see what it is."]; } },
+    { id: "big", t: "The $10 million club", s: "Only the biggest projects", groups: null, min: 10000000,
+      cap: (c) => { const tot = c.reduce((a, p) => a + p.v, 0), all = D.permits.reduce((a, p) => a + p.v, 0), b = c.slice().sort((x, y) => y.v - x.v)[0];
+        return [c.length + " projects of $10 million or more", "They add up to " + compact(tot) + ", about " + Math.round(100 * tot / all) + "% of everything permitted this year." + (b ? " The biggest: " + what(b) + " at " + b.a + ", " + compact(b.v) + "." : "")]; } },
+    { id: "suites", t: "Suites and basements", s: "A quiet way Regina adds housing", groups: ["suites"],
+      cap: (c) => { const [h, hn] = topBy(c, (p) => p.n, () => 1); return [c.length + " permits for secondary suites and basement developments", "Not new buildings, but new places to live in existing ones. Most in " + (h || "none") + " (" + hn + ")."]; } },
+    { id: "month", t: "What's new this month", s: "The last 30 days of permits", groups: null, days: 30,
+      cap: (c) => { const tot = c.reduce((a, p) => a + p.v, 0), b = c.slice().sort((x, y) => y.v - x.v)[0]; return [num(c.length) + " permits in the last 30 days", compact(tot) + " of declared construction value." + (b ? " The biggest: " + what(b) + " at " + b.a + ", " + compact(b.v) + "." : "")]; } },
+    { id: "commercial", t: "Shops, offices and factories", s: "New commercial buildings and renovations", groups: ["new-commercial", "commercial-reno"],
+      cap: (c) => { const tot = c.reduce((a, p) => a + p.v, 0), [h] = topBy(c, (p) => p.n, (p) => p.v); return [num(c.length) + " commercial, industrial and institutional permits", compact(tot) + " declared. The most value: " + (h || "none") + "."]; } },
+    { id: "rezone", t: "Rezoned and proposed", s: "Zoning changes and open City applications", groups: null, events: true,
+      cap: () => { const open = D.applications.filter((a) => a.open).length; return [D.rezonings.length + " rezonings spotted, " + D.applications.length + " applications listed", open + " open for public comment right now. Diamonds are rezonings; circles are applications (orange = open for comment). Click one for the City's notice."]; } },
+  ];
+  $("stories").innerHTML = STORIES.map((s, i) => '<button type="button" class="story" data-story="' + s.id + '" aria-pressed="false"><span class="n">0' + (i + 1) + '</span><span><b>' + esc(s.t) + '</b><span class="s">' + esc(s.s) + "</span></span></button>").join("");
+  function storyButtons() { document.querySelectorAll(".story").forEach((b) => b.setAttribute("aria-pressed", b.dataset.story === state.story ? "true" : "false")); }
+  function setGroups(list) { state.groups = new Set(list || M.groups.map((g) => g.key)); document.querySelectorAll("#chips input").forEach((i) => { i.checked = state.groups.has(i.value); }); }
+  function setControls() { $("f-days").value = String(state.days); $("f-value").value = String(state.min); $("f-hood").value = state.hood; $("f-q").value = state.q; }
+  function resetAll() {
+    stop(); Object.assign(state, { days: 365, t: 364, min: 0, hood: "", q: "", shade: "zoning", story: "", showAll: false });
+    setGroups(null); setControls(); $("t-permits").checked = true; $("t-events").checked = true; $("t-roads").checked = true;
+    eventLayer.addTo(map); roadLayer.addTo(map); syncRoadNames(); document.querySelector('#shade input[value="zoning"]').checked = true; storyButtons(); hideCaption();
+  }
+  function runStory(id) {
+    const s = STORIES.find((x) => x.id === id); if (!s) return;
+    if (state.story === id) { resetAll(); refresh(); fitCity(); return; }
+    resetAll(); state.story = id; setGroups(s.groups); if (s.min) state.min = s.min; if (s.days) { state.days = s.days; state.t = s.days - 1; }
+    if (s.events) { $("t-permits").checked = false; }
+    setControls(); storyButtons(); refresh();
+    if (s.events) { const pts = D.rezonings.map((r) => [r.lat, r.lon]).concat(D.applications.filter((a) => a.lon != null).map((a) => [a.lat, a.lon])); if (pts.length) map.fitBounds(L.latLngBounds(pts).pad(0.35), { maxZoom: 14, animate: !reduced }); }
+    else fitCity();
+    const [t, p] = s.cap(current); caption(t, p);
+  }
+  $("stories").addEventListener("click", (e) => { const b = e.target.closest("[data-story]"); if (b) runStory(b.dataset.story); });
+
+  $("surprise").addEventListener("click", () => {
+    resetAll(); refresh();
+    const pool = D.permits.filter((p) => p.lon != null && p.v >= 250000);
+    const p = pool[Math.floor(Math.random() * pool.length)]; if (!p) return;
+    map.setView([p.lat, p.lon], 16, { animate: !reduced });
+    L.popup({ maxWidth: 290 }).setLatLng([p.lat, p.lon]).setContent(permitPopup(p)).openOn(map);
+    const w = what(p); caption("Surprise: " + short(p.v) + " at " + p.a, cap1(article(w)) + w + " in " + p.n + ", issued " + fmtDate(p.d) + ". Press the button again for another.");
+  });
+  document.addEventListener("click", (e) => {
+    const s = e.target.closest("[data-spot]"); if (s) { spotlight(s.dataset.spot); return; }
+    const f = e.target.closest("[data-find]"); if (f) { const p = D.permits.find((x) => x.id === f.dataset.find); if (p && p.lon != null) { map.setView([p.lat, p.lon], 17, { animate: !reduced }); L.popup({ maxWidth: 290 }).setLatLng([p.lat, p.lon]).setContent(permitPopup(p)).openOn(map); } }
+  });
+
+  function buildFacts() {
+    const all = D.permits, total = all.reduce((a, p) => a + p.v, 0), fs = [];
+    fs.push("In the 12 months to " + fmtDate(M.latest) + " the City issued " + num(all.length) + " building permits with " + compact(total) + " of declared construction value. That is about " + Math.round(all.length / 250) + " permits every working day.");
+    const [h1, n1] = topBy(all, (p) => p.n, () => 1); fs.push("Busiest neighbourhood by number of permits: " + h1 + " (" + num(n1) + ").");
+    const [h2, u2] = topBy(all.filter((p) => p.t !== "Backyard/Laneway Suite"), (p) => p.n, (p) => (p.g === "new-homes" || p.g === "new-multi" ? p.units : 0)); fs.push("Most new homes permitted: " + h2 + ", about " + num(u2) + " of them.");
+    const big = all.slice().sort((a, b) => b.v - a.v)[0]; fs.push("The single biggest permit: " + what(big) + " at " + big.a + " (" + big.n + "), declared at " + compact(big.v) + ".");
+    fs.push("Half of all permits are for jobs under " + money(median(all.map((p) => p.v))) + ". Most building in Regina is small renovation work, not towers.");
+    const wd = {}; all.forEach((p) => { const k = new Date(p.d + "T12:00:00").toLocaleDateString("en-CA", { weekday: "long" }); wd[k] = (wd[k] || 0) + 1; }); const bw = Object.entries(wd).sort((a, b) => b[1] - a[1])[0];
+    fs.push("The City issues the most permits on " + bw[0] + "s (" + num(bw[1]) + " in the last year).");
+    const lan = all.filter((p) => p.t === "Backyard/Laneway Suite").length; fs.push(num(lan) + " backyard or laneway suites were permitted in the last 12 months.");
+    const pops = D.series.population, pf = pops[0], pl = pops[pops.length - 1]; fs.push("Regina grew from " + num(pf.v) + " people in " + pf.y + " to " + num(pl.v) + " in " + pl.y + ", up " + Math.round(100 * (pl.v / pf.v - 1)) + "% (Statistics Canada).");
+    return fs;
+  }
+  const FACTS = buildFacts();
+  const showFact = () => { $("fact").textContent = FACTS[state.fact % FACTS.length]; };
+  $("fact-next").addEventListener("click", () => { state.fact = (state.fact + 1) % FACTS.length; showFact(); });
+  state.fact = Math.floor(Math.random() * FACTS.length); showFact();
+
+  // ---------------------------------------------------------------- time-lapse
+  let timer = null, playing = false;
+  function stop() { playing = false; clearInterval(timer); timer = null; $("play").innerHTML = "&#9654;"; $("play").setAttribute("aria-label", "Play the time-lapse"); }
+  function play() {
+    if (playing) { stop(); return; }
+    if (state.t >= state.days - 1) state.t = 0;
+    playing = true; $("play").innerHTML = "&#10073;&#10073;"; $("play").setAttribute("aria-label", "Pause the time-lapse");
+    const step = Math.max(1, Math.round(state.days / 70));
+    refresh();
+    timer = setInterval(() => { state.t = Math.min(state.days - 1, state.t + step); refresh(); if (state.t >= state.days - 1) stop(); }, 110);
+  }
+  $("play").addEventListener("click", play);
+  $("play2").addEventListener("click", () => { if (!playing) { state.t = 0; } play(); });
+  $("slider").addEventListener("input", (e) => { stop(); state.t = +e.target.value; refresh(); });
+
+  // ---------------------------------------------------------------- wiring
+  $("chips").addEventListener("change", (e) => { e.target.checked ? state.groups.add(e.target.value) : state.groups.delete(e.target.value); state.story = ""; storyButtons(); refresh(); });
+  $("f-days").addEventListener("change", (e) => { state.days = +e.target.value; state.t = state.days - 1; state.story = ""; storyButtons(); refresh(); });
+  $("f-value").addEventListener("change", (e) => { state.min = +e.target.value; state.story = ""; storyButtons(); refresh(); });
+  $("f-hood").addEventListener("change", (e) => { if (e.target.value) spotlight(e.target.value); else { setHood(""); fitCity(); } });
+  let qTimer;
+  $("f-q").addEventListener("input", (e) => { clearTimeout(qTimer); qTimer = setTimeout(() => { state.q = e.target.value.trim().toLowerCase(); refresh(); }, 150); });
+  $("t-permits").addEventListener("change", () => refresh());
+  $("t-events").addEventListener("change", (e) => { e.target.checked ? eventLayer.addTo(map) : map.removeLayer(eventLayer); writeHash(); });
+  $("t-roads").addEventListener("change", (e) => { e.target.checked ? roadLayer.addTo(map) : map.removeLayer(roadLayer); syncRoadNames(); writeHash(); });
+  $("shade").addEventListener("change", (e) => { state.shade = e.target.value; refresh(); });
+  document.querySelectorAll("th button").forEach((b) => b.addEventListener("click", () => { state.sort = b.dataset.sort; document.querySelectorAll("th button").forEach((x) => x.setAttribute("aria-pressed", x === b ? "true" : "false")); renderHoods(); }));
+  $("hood-more").addEventListener("click", () => { state.showAll = !state.showAll; renderHoods(); });
+  $("hood-body").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-n]"); if (tr) spotlight(tr.dataset.n); });
+  $("hood-body").addEventListener("keydown", (e) => { if (e.key === "Enter") { const tr = e.target.closest("tr[data-n]"); if (tr) spotlight(tr.dataset.n); } });
+  $("reset").addEventListener("click", () => { resetAll(); refresh(); fitCity(); });
+  $("copy").addEventListener("click", () => {
+    const url = location.href; const done = () => { $("copy").textContent = "Link copied"; setTimeout(() => ($("copy").textContent = "Copy a link to this view"), 1800); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, () => window.prompt("Copy this link:", url)); else window.prompt("Copy this link:", url);
+  });
+
+  // tabs
+  const TABS = ["explore", "places", "numbers", "about"];
+  function showTab(name) {
+    TABS.forEach((t) => { const on = t === name; $("tab-" + t).setAttribute("aria-selected", on ? "true" : "false"); $("tab-" + t).tabIndex = on ? 0 : -1; $("p-" + t).hidden = !on; });
+  }
+  TABS.forEach((t) => $("tab-" + t).addEventListener("click", () => showTab(t)));
+  document.querySelector(".tabs").addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    const cur = TABS.findIndex((t) => $("tab-" + t).getAttribute("aria-selected") === "true"), nx = TABS[(cur + (e.key === "ArrowRight" ? 1 : TABS.length - 1)) % TABS.length];
+    showTab(nx); $("tab-" + nx).focus();
+  });
+
+  // ---------------------------------------------------------------- charts
+  function lineChart(title, sub, series, opts) {
+    const W = 340, H = 160, m = { l: 8, r: 64, t: 10, b: 20 };
+    const xs = series.flatMap((s) => s.pts.map((p) => p.x)), ys = series.flatMap((s) => s.pts.map((p) => p.y));
+    const x0 = Math.min(...xs), x1 = Math.max(...xs); let y0 = Math.min(...ys, opts.zero ? 0 : Infinity), y1 = Math.max(...ys);
+    if (y0 === y1) y1 = y0 + 1;
+    const X = (v) => m.l + (W - m.l - m.r) * (v - x0) / (x1 - x0), Y = (v) => H - m.b - (H - m.t - m.b) * (v - y0) / (y1 - y0);
+    let g = "";
+    if (y0 < 0 && y1 > 0) g += '<line x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + Y(0) + '" y2="' + Y(0) + '" stroke="rgba(237,232,224,.3)" stroke-dasharray="3 3"/>';
+    series.forEach((s) => {
+      g += '<polyline fill="none" stroke="' + s.color + '" stroke-width="2" points="' + s.pts.map((p) => X(p.x).toFixed(1) + "," + Y(p.y).toFixed(1)).join(" ") + '"/>';
+      const last = s.pts[s.pts.length - 1];
+      g += '<circle cx="' + X(last.x) + '" cy="' + Y(last.y) + '" r="3" fill="' + s.color + '"/><text class="lb" x="' + (X(last.x) + 6) + '" y="' + (Y(last.y) + 4) + '" fill="' + s.color + '">' + esc(opts.fmt(last.y)) + "</text>";
+      s.pts.forEach((p) => { g += '<circle cx="' + X(p.x) + '" cy="' + Y(p.y) + '" r="7" fill="transparent"><title>' + esc(s.name + ", " + p.x + ": " + opts.fmt(p.y)) + "</title></circle>"; });
+    });
+    if (series.length === 1) { const f0 = series[0].pts[0]; g += '<text class="ax" x="' + (X(f0.x) + 2) + '" y="' + (Y(f0.y) - 7) + '">' + esc(opts.fmt(f0.y)) + "</text>"; }
+    g += '<text class="ax" x="' + m.l + '" y="' + (H - 4) + '">' + x0 + '</text><text class="ax" x="' + (W - m.r) + '" y="' + (H - 4) + '" text-anchor="end">' + x1 + "</text>";
+    const key = series.length > 1 ? '<p style="margin:4px 0 0">' + series.map((s) => '<span style="color:' + s.color + '">&#9632;</span> ' + esc(s.name)).join(" &nbsp; ") + "</p>" : "";
+    const label = title + ". " + series.map((s) => s.name + " " + opts.fmt(s.pts[0].y) + " in " + s.pts[0].x + " to " + opts.fmt(s.pts[s.pts.length - 1].y) + " in " + s.pts[s.pts.length - 1].x).join("; ");
+    return '<div class="chart"><h3>' + esc(title) + "</h3><p>" + esc(sub) + '</p><svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(label) + '">' + g + "</svg>" + key + "</div>";
+  }
+  (function charts() {
+    const S = D.series, B = "#ED6B2E", C = "#56B4E9", G = "#2FCB9A", Y = "#F0E442";
+    $("charts").innerHTML =
+      lineChart("People living in Regina", "Population estimate, July 1 each year (Statistics Canada). The scale does not start at zero.", [{ name: "Population", color: B, pts: S.population.map((p) => ({ x: p.y, y: p.v })) }], { fmt: num, zero: false }) +
+      lineChart("The average rent", "Average rent for a purpose-built rental unit, every October (CMHC).", [{ name: "Average rent", color: B, pts: S.rent.map((r) => ({ x: r.y, y: r.rent })) }], { fmt: (v) => money(v), zero: true }) +
+      lineChart("How easy is it to find a place?", "Rental vacancy rate, per cent of units empty (CMHC). Lower means tighter.", [{ name: "Vacancy rate", color: C, pts: S.rent.map((r) => ({ x: r.y, y: r.vac })) }], { fmt: (v) => v.toFixed(1) + "%", zero: true }) +
+      lineChart("Where new Regina residents come from", "Each year's change in the Regina area (Statistics Canada).", [
+        { name: "Immigrants", color: B, pts: S.migration.map((m) => ({ x: m.y, y: m.imm })) },
+        { name: "Births minus deaths", color: G, pts: S.migration.map((m) => ({ x: m.y, y: m.births - m.deaths })) },
+        { name: "Net moves from other provinces", color: Y, pts: S.migration.map((m) => ({ x: m.y, y: m.inter })) }], { fmt: (v) => (v > 0 ? "+" : "") + num(v), zero: true });
+  })();
+
+  // ---------------------------------------------------------------- share link
+  function writeHash() {
+    const h = [], all = M.groups.map((g) => g.key);
+    if (state.days !== 365) h.push("days=" + state.days);
+    if (state.t !== state.days - 1) h.push("t=" + state.t);
+    if (state.min) h.push("min=" + state.min);
+    if (state.hood) h.push("hood=" + encodeURIComponent(state.hood));
+    if (state.q) h.push("q=" + encodeURIComponent(state.q));
+    if (state.groups.size !== all.length) h.push("g=" + all.filter((k) => state.groups.has(k)).join(","));
+    if (state.shade !== "zoning") h.push("shade=" + state.shade);
+    if (!$("t-events").checked) h.push("ev=0");
+    if (!$("t-roads").checked) h.push("rd=0");
+    if (!$("t-permits").checked) h.push("pm=0");
+    const c = map.getCenter(); h.push("v=" + c.lat.toFixed(4) + "," + c.lng.toFixed(4) + "," + map.getZoom());
+    try { history.replaceState(null, "", "#" + h.join("&")); } catch (e) { /* sandboxed frame: skip */ }
+  }
+  map.on("moveend", () => { clearTimeout(writeHash.t); writeHash.t = setTimeout(writeHash, 300); });
+  function readHash() {
+    const h = location.hash.replace(/^#/, ""); if (!h) return false;
+    const q = Object.fromEntries(h.split("&").map((x) => { const i = x.indexOf("="); return [x.slice(0, i), decodeURIComponent(x.slice(i + 1))]; }));
+    if (q.days) state.days = +q.days; state.t = q.t != null ? +q.t : state.days - 1; if (q.min) state.min = +q.min; if (q.hood) state.hood = q.hood; if (q.q) state.q = q.q.toLowerCase();
+    if (q.g) setGroups(q.g.split(",")); if (q.shade && SHADES[q.shade]) { state.shade = q.shade; const r = document.querySelector('#shade input[value="' + q.shade + '"]'); if (r) r.checked = true; }
+    if (q.ev === "0") { $("t-events").checked = false; map.removeLayer(eventLayer); } if (q.rd === "0") { $("t-roads").checked = false; map.removeLayer(roadLayer); } if (q.pm === "0") $("t-permits").checked = false;
+    setControls(); if (q.q) $("f-q").value = q.q;
+    if (q.v) { const [la, lo, z] = q.v.split(",").map(Number); if (isFinite(la) && isFinite(lo) && isFinite(z)) map.setView([la, lo], z, { animate: false }); }
+    return true;
+  }
+  const restored = readHash();
+  syncRoadNames(); refresh();
+  if (!restored) { caption("Click anything", "Every dot is a building permit the City issued. Pick a story, press play to watch the year build up, or hit Surprise me."); introTimer = setTimeout(hideCaption, 12000); }
+  window.addEventListener("resize", () => map.invalidateSize());
+  const settle = () => { map.invalidateSize(); if (!restored && !state.hood && !state.story) fitCity(); };
+  requestAnimationFrame(settle); setTimeout(settle, 350);
+  }
+})();
+</script>
+</body>
+</html>

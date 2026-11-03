@@ -1,0 +1,98 @@
+[
+  {
+    "event_id": "zoning-1592",
+    "kind": "polygon expanded",
+    "zoning_from": "RU",
+    "zoning_to": "RH",
+    "zoning_to_description": "Residential High-Rise",
+    "bylaw_number": "2026-39",
+    "community_association": "AL RITCHIE",
+    "ward": "6",
+    "lon": -104.577883,
+    "lat": 50.440062,
+    "nearest_address": "2430 Harvey Street",
+    "approx_area_m2": 750,
+    "linked_applications": [
+      {
+        "file_number": "PL202600169",
+        "address": "2450 Harvey Street",
+        "application_type": "Zoning Bylaw Amendment",
+        "description": "Rezone a portion of the property from RU - Residential Urban Zone to RH - Residential High-Rise Zone"
+      }
+    ],
+    "baseline_snapshot": "2026-07-26",
+    "first_detected": "2026-10-25"
+  },
+  {
+    "event_id": "zoning-80321",
+    "kind": "new zoning polygon",
+    "zoning_from": "RU",
+    "zoning_to": "ML",
+    "zoning_to_description": "Mixed Low-Rise",
+    "bylaw_number": "2026-40",
+    "community_association": "NORTH CENTRAL",
+    "ward": "8",
+    "lon": -104.631529,
+    "lat": 50.453512,
+    "nearest_address": "1578 Elphinstone Street",
+    "approx_area_m2": 921,
+    "linked_applications": [
+      {
+        "file_number": "PL202600146",
+        "address": "1578 Elphinstone Street",
+        "application_type": "Zoning Bylaw Amendment",
+        "description": "Rezone from RU \u2013 Residential Urban Zone to ML \u2013 Mixed Low-Rise Zone"
+      }
+    ],
+    "baseline_snapshot": "2026-07-26",
+    "first_detected": "2026-10-25"
+  },
+  {
+    "event_id": "zoning-80322",
+    "kind": "new zoning polygon",
+    "zoning_from": "MH",
+    "zoning_to": "RH",
+    "zoning_to_description": "Residential High-Rise",
+    "bylaw_number": "2026-38",
+    "community_association": "NORTHEAST",
+    "ward": "7",
+    "lon": -104.606925,
+    "lat": 50.476624,
+    "nearest_address": "120 Broad Street",
+    "approx_area_m2": 6252,
+    "linked_applications": [
+      {
+        "file_number": "PL202600174",
+        "address": "120 Broad Street",
+        "application_type": "Zoning Bylaw Amendment",
+        "description": "Proposed rezoning from MH - Mixed High-Rise Zone to RH - Residential High-Rise Zone"
+      }
+    ],
+    "baseline_snapshot": "2026-07-26",
+    "first_detected": "2026-10-25"
+  },
+  {
+    "event_id": "zoning-80641",
+    "kind": "new zoning polygon",
+    "zoning_from": "RL",
+    "zoning_to": "C",
+    "zoning_to_description": "Contract",
+    "bylaw_number": "2026-46",
+    "community_association": "NORTH CENTRAL",
+    "ward": "8",
+    "lon": -104.622867,
+    "lat": 50.459665,
+    "nearest_address": "1202 Retallack Street",
+    "approx_area_m2": 2114,
+    "linked_applications": [
+      {
+        "file_number": "PL202600241",
+        "address": "1202 & 1212 Retallack Street",
+        "application_type": "Contract Zone",
+        "description": "Proposed Neighbourhood Revitalization Facility"
+      }
+    ],
+    "baseline_snapshot": "2026-07-26",
+    "first_detected": "2026-10-25"
+  }
+]
