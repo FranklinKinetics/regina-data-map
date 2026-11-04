@@ -11,6 +11,7 @@ on:
     branches: [main]
     paths:
       - config/lab-content.json
+      - config/tax-rates.json
       - templates/**
       - scripts/build_lab_map.py
       - scripts/export_open_data.py
@@ -59,6 +60,7 @@ jobs:
           assert len(d["permits"]) > 10000, "too few permits: " + str(len(d["permits"]))
           assert len(d["zoning"]["features"]) > 10, "zoning missing"
           assert d["content"]["stories"] and d["content"]["facts"], "map words missing"
+          assert len(d["series"]["tax"]) >= 8, "tax rates missing"
           print("ok:", len(d["permits"]), "permits through", d["meta"]["latest"])
           PY
 

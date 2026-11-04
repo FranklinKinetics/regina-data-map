@@ -465,7 +465,7 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
     "City of Regina, Proposed Development notices (snapshot " + fmtDate(A.applications) + "). Rezonings are spotted by comparing the City's own zoning snapshots, so only changes since " + fmtDate(A.rezoning_baseline || "2026-07-26") + " show.",
     "Statistics Canada: population estimates for July 1, " + A.population_year + " (Table 17-10-0155-01, released " + fmtDate(A.population) + "); components of population change to " + A.migration_year + " (Table 17-10-0149-01); 2021 Census income and shelter-cost data.",
     "Canada Mortgage and Housing Corporation (CMHC), Rental Market Survey, Regina, to " + A.rent_year + ".",
-  ].map((s) => "<li>" + esc(s) + "</li>").join("");
+  ].concat(A.tax_year ? ["City of Regina, Property Tax Bylaws " + A.tax_first_year + " to " + A.tax_year + " (City Clerk, on the City's open data site): mill rates and mill rate factors. The map does not show anyone's assessed value or tax bill."] : []).map((s) => "<li>" + esc(s) + "</li>").join("");
   $("gaps").innerHTML = [
     M.unplotted + " of " + num(M.total_permits) + " permits could not be matched to a City address point. They are counted in totals and tables but not drawn.",
     "Permit values are declared estimates, and a few very large permits can dominate an area's total.",
@@ -773,14 +773,14 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
     const f = e.target.closest("[data-find]"); if (f) { if (playing) pausePlay(); const p = D.permits.find((x) => x.id === f.dataset.find); if (p && p.lon != null) { map.setView([p.lat, p.lon], 17, { animate: !reduced }); L.popup({ maxWidth: 290 }).setLatLng([p.lat, p.lon]).setContent(permitPopup(p)).openOn(map); } }
   });
 
-  /* tokens:fact latest first_year since permits_12m value_12m homes_12m per_day_12m top_hood_count_12m top_hood_count_12m_n top_hood_homes_12m top_hood_homes_12m_n biggest_what_12m biggest_address_12m biggest_hood_12m biggest_value_12m median_12m busiest_weekday busiest_weekday_n laneway_12m permits_all value_all best_year best_year_value biggest_what_all biggest_address_all biggest_value_all biggest_date_all pop_first pop_first_year pop_last pop_last_year pop_growth_pct rent_last rent_last_year rent_first rent_first_year vacancy_last rezonings applications open_applications */
+  /* tokens:fact latest first_year since permits_12m value_12m homes_12m per_day_12m top_hood_count_12m top_hood_count_12m_n top_hood_homes_12m top_hood_homes_12m_n biggest_what_12m biggest_address_12m biggest_hood_12m biggest_value_12m median_12m busiest_weekday busiest_weekday_n laneway_12m permits_all value_all best_year best_year_value biggest_what_all biggest_address_all biggest_value_all biggest_date_all pop_first pop_first_year pop_last pop_last_year pop_growth_pct rent_last rent_last_year rent_first rent_first_year vacancy_last rezonings applications open_applications tax_year tax_res_100k tax_com_100k tax_com_more_pct */
   function factTokens() {
     const all = YEAR, A_ = D.permits, total = all.reduce((a, p) => a + p.v, 0);
     const [h1, n1] = topBy(all, (p) => p.n, () => 1), [h2, u2] = topBy(all, (p) => p.n, homesOf), big = all.slice().sort((a, b) => b.v - a.v)[0], bigAll = A_.slice().sort((a, b) => b.v - a.v)[0];
     const wd = {}; all.forEach((p) => { const k = new Date(p.d + "T12:00:00").toLocaleDateString("en-CA", { weekday: "long" }); wd[k] = (wd[k] || 0) + 1; }); const bw = Object.entries(wd).sort((a, b) => b[1] - a[1])[0] || ["", 0];
     const yr = {}; A_.forEach((p) => { const y = p.d.slice(0, 4); yr[y] = (yr[y] || 0) + p.v; });
     const full = Object.entries(yr).filter(([y]) => +y < +M.latest.slice(0, 4)).sort((a, b) => b[1] - a[1])[0];
-    const pops = D.series.population, pf = pops[0], pl = pops[pops.length - 1], rents = D.series.rent, rf = rents[0], rl = rents[rents.length - 1];
+    const pops = D.series.population, pf = pops[0], pl = pops[pops.length - 1], rents = D.series.rent, rf = rents[0], rl = rents[rents.length - 1], taxes = D.series.tax || [], tl = taxes[taxes.length - 1];
     return {
       latest: fmtDate(M.latest), first_year: T0.slice(0, 4), since: fmtDate(T0),
       permits_12m: num(all.length), value_12m: compact(total), homes_12m: num(newUnits(all)), per_day_12m: String(Math.round(all.length / 250)),
@@ -792,6 +792,7 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
       pop_first: pf ? num(pf.v) : "", pop_first_year: pf ? String(pf.y) : "", pop_last: pl ? num(pl.v) : "", pop_last_year: pl ? String(pl.y) : "", pop_growth_pct: pf && pl ? String(Math.round(100 * (pl.v / pf.v - 1))) : "",
       rent_last: rl ? money(rl.rent) : "", rent_last_year: rl ? String(rl.y) : "", rent_first: rf ? money(rf.rent) : "", rent_first_year: rf ? String(rf.y) : "", vacancy_last: rl ? rl.vac.toFixed(1) + "%" : "",
       rezonings: String(D.rezonings.length), applications: String(D.applications.length), open_applications: String(D.applications.filter((a) => a.open).length),
+      tax_year: tl ? String(tl.y) : "", tax_res_100k: tl ? money(tl.res) : "", tax_com_100k: tl ? money(tl.com) : "", tax_com_more_pct: tl ? String(Math.round(100 * (tl.com / tl.res - 1))) : "",
     };
   }
   function buildFacts() { const tk = factTokens(), out = C.facts.map((f) => fill(f, tk)).filter((r) => r.ok).map((r) => r.text); return out.length ? out : ["Every dot is a building permit the City issued."]; }
@@ -1089,7 +1090,14 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
       lineChart("Permits issued each month", "Every complete month since " + ml(keys[0]) + ". Winter dips and summer peaks are normal.", [{ name: "Permits", color: B, pts: keys.map((k) => ({ x: mx(k), l: ml(k), y: by[k].n })) }], { fmt: num, zero: true, xfmt: yrs }) +
       lineChart("How much is being built", "Declared construction value of all permits issued in the 12 months up to each month. A few huge projects can make it jump.", [{ name: "Declared value", color: B, pts: roll((m) => m.v) }], { fmt: short, zero: true, xfmt: yrs }) +
       lineChart("New homes permitted", "Homes on new house, apartment and townhouse permits in the 12 months up to each month. Suites are counted separately.", [{ name: "New homes", color: C, pts: roll((m) => m.h) }], { fmt: num, zero: true, xfmt: yrs });
+    // City + Library property tax per $100,000 of assessed value (from the yearly Property Tax Bylaw)
+    const T = S.tax || [], resets = T.filter((t) => t.reset).map((t) => t.y);
+    const taxChart = T.length < 2 ? "" : lineChart("What the City charges in property tax",
+      "City and Library tax on each $100,000 of assessed value, from the City's yearly tax bylaw. Homes and apartments pay the lower rate; commercial and industrial pay the higher. The Province's education tax is not included." +
+      (resets.length ? " The City re-sets every property's assessed value every four years (" + resets.join(" and ") + " here), so compare years within each stretch. Across a reset the assessment changes too, so the rate alone does not show anyone's bill." : ""),
+      [{ name: "Homes and apartments", color: B, pts: T.map((t) => ({ x: t.y, y: t.res })) }, { name: "Commercial and industrial", color: C, pts: T.map((t) => ({ x: t.y, y: t.com })) }], { fmt: (v) => money(v), zero: true });
     $("charts").innerHTML = built +
+      taxChart +
       lineChart("People living in Regina", "Population estimate, July 1 each year (Statistics Canada). The scale does not start at zero.", [{ name: "Population", color: B, pts: S.population.map((p) => ({ x: p.y, y: p.v })) }], { fmt: num, zero: false }) +
       lineChart("The average rent", "Average rent for a purpose-built rental unit, every October (CMHC).", [{ name: "Average rent", color: B, pts: S.rent.map((r) => ({ x: r.y, y: r.rent })) }], { fmt: (v) => money(v), zero: true }) +
       lineChart("How easy is it to find a place?", "Rental vacancy rate, per cent of units empty (CMHC). Lower means tighter.", [{ name: "Vacancy rate", color: C, pts: S.rent.map((r) => ({ x: r.y, y: r.vac })) }], { fmt: (v) => v.toFixed(1) + "%", zero: true }) +

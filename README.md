@@ -22,8 +22,9 @@ No company, applicant or owner names are published here. Names in the City's per
 
 ## Use the data yourself
 
-* **Download files** (no sign-up, no code): `https://franklinkinetics.github.io/regina-data-map/data/` has `permits.csv`, `permits.geojson`, `rezonings.json`, `applications.json`, `context.json` and a `data-dictionary.json`. Rebuilt every Friday.
+* **Download files** (no sign-up, no code): `https://franklinkinetics.github.io/regina-data-map/data/` has `permits.csv`, `permits.geojson`, `rezonings.json`, `applications.json`, `context.json`, `tax-rates.csv` (City property tax rates by year since 2019) and a `data-dictionary.json`. Rebuilt every Friday.
 * **Change the words on the map** (stories, facts, opening message) without a new download: see [`CONTENT-GUIDE.md`](CONTENT-GUIDE.md).
+* **Property tax rates** come from the City's yearly Property Tax Bylaw, typed into `config/tax-rates.json`. Add the new year each spring (instructions at the end of the guide above).
 
 ## How the weekly refresh works
 

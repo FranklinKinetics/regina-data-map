@@ -9,6 +9,7 @@ Reads the finished map data (lab-02/latest-v1.json) and writes, into site/data/ 
   rezonings.json        rezonings spotted by comparing the City's zoning maps over time
   applications.json     the City's current Proposed Development applications
   context.json          Regina population, rents, vacancy and population change (Statistics Canada, CMHC)
+  tax-rates.csv         City of Regina property tax rates by year since 2019, from the yearly tax bylaw
   data-dictionary.json  what every column means, plus the caveats and the licence
   index.html            a plain download page
 
@@ -38,7 +39,24 @@ COLUMNS = [
     ("longitude", "lon", "WGS84 longitude of the matched City address point. Blank when the address could not be matched."),
 ]
 
+TAX_COLUMNS = [
+    ("year", "y", "Tax year."),
+    ("bylaw", "bylaw", "The City's Property Tax Bylaw number for that year (City Clerk, on openregina.ca). Every number in this file is typed in from that bylaw."),
+    ("city_mills", "city", "City mill rate. A mill is a dollar of tax per $1,000 of assessed value."),
+    ("library_mills", "lib", "Regina Public Library mill rate."),
+    ("downtown_bid_mills", "bid_dt", "Extra mill rate on businesses inside the Regina Downtown Business Improvement District."),
+    ("warehouse_bid_mills", "bid_wh", "Extra mill rate on businesses inside Regina's Warehouse Business Improvement District."),
+    ("factor_residential", "f_res", "Mill rate factor for residential property. The City and Library mills are multiplied by this."),
+    ("factor_multi_family", "f_multi", "Mill rate factor for multi-family residential (four or more units)."),
+    ("factor_commercial", "f_com", "Mill rate factor for commercial and industrial property (also resource, railway/pipeline and agricultural)."),
+    ("factor_golf", "f_golf", "Mill rate factor for golf courses."),
+    ("residential_per_100k", "res", "City + Library tax in dollars on each $100,000 of assessed value, residential: (city + library mills) x residential factor x 100."),
+    ("commercial_per_100k", "com", "The same for commercial and industrial property."),
+    ("assessment_reset_year", "reset", "True when the class multipliers changed this year, which is when the City re-set every property's assessed value (2021 and 2025). Rates either side of a reset are not like for like, and the rate alone does not show anyone's tax bill."),
+]
+
 CAVEATS = [
+    "tax-rates.csv is the City and Library rates only. The Province's education property tax is separate and not included. It holds rates, not anyone's assessed value or tax bill.",
     "Permits are listed when issued. A permit means work is approved to begin. It does not mean the work is finished or that it will cost the declared amount.",
     "Declared values are the applicant's own estimates. A few very large permits can dominate any total.",
     "About 3% of permits could not be matched to a City address point and have no coordinates.",
@@ -74,10 +92,17 @@ def main() -> None:
         "rent": {"source": "CMHC Rental Market Survey, Regina (average rent of purpose-built rentals, October; vacancy rate in per cent)", "rows": d["series"]["rent"]},
         "population_change": {"source": "Statistics Canada, Table 17-10-0149-01 (Regina area)", "rows": d["series"]["migration"]},
     }, indent=1), encoding="utf-8")
+    tax = d["series"].get("tax") or []
+    with (out / "tax-rates.csv").open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow([c[0] for c in TAX_COLUMNS])
+        for t in tax:
+            w.writerow([t[c[1]] for c in TAX_COLUMNS])
+
     (out / "data-dictionary.json").write_text(json.dumps({
         "built": meta["built"], "permits_issued_from": meta["asof"]["permits_start"], "permits_issued_through": meta["latest"], "permit_count": len(permits),
         "licence": meta["attribution"] + " Statistics Canada and CMHC figures: see the sources named in context.json.",
-        "columns": {c[0]: c[2] for c in COLUMNS}, "work_groups": {g["key"]: g["label"] for g in meta["groups"]}, "caveats": CAVEATS,
+        "columns": {c[0]: c[2] for c in COLUMNS}, "tax_rate_columns": {c[0]: c[2] for c in TAX_COLUMNS}, "work_groups": {g["key"]: g["label"] for g in meta["groups"]}, "caveats": CAVEATS,
     }, indent=1, ensure_ascii=False), encoding="utf-8")
 
     rows = "".join(f'<tr><td><a href="{n}">{n}</a></td><td>{html.escape(t)}</td></tr>' for n, t in [
@@ -86,6 +111,7 @@ def main() -> None:
         ("rezonings.json", "Rezonings spotted in the City's zoning maps"),
         ("applications.json", "The City's current Proposed Development applications"),
         ("context.json", "Regina population, rents, vacancy and population change"),
+        ("tax-rates.csv", "City of Regina property tax rates by year, 2019 on (from the yearly tax bylaw)"),
         ("data-dictionary.json", "What every column means, the caveats and the licence")])
     (out / "index.html").write_text(
         '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Regina Data Map: open data</title>'

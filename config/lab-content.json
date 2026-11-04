@@ -85,6 +85,7 @@
     "The biggest full year for declared construction value since {first_year} was {best_year}, at {best_year_value}.",
     "The biggest permit since {first_year}: {biggest_what_all} at {biggest_address_all}, {biggest_value_all}, issued {biggest_date_all}.",
     "Regina grew from {pop_first} people in {pop_first_year} to {pop_last} in {pop_last_year}, up {pop_growth_pct}% (Statistics Canada).",
-    "Average rent for a purpose-built rental unit in Regina was {rent_last} in {rent_last_year}, and {vacancy_last} of units were empty (CMHC)."
+    "Average rent for a purpose-built rental unit in Regina was {rent_last} in {rent_last_year}, and {vacancy_last} of units were empty (CMHC).",
+    "In {tax_year} the City and Library charge {tax_res_100k} in property tax on every $100,000 of a home's assessed value. Commercial and industrial property pays {tax_com_more_pct}% more per dollar of assessed value ({tax_com_100k}). The Province's education tax is extra."
   ]
 }

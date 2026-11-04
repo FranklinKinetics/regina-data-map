@@ -86,6 +86,39 @@ def series(folder: str) -> list[dict]:
     return sorted((f["properties"] for f in fc["features"]), key=lambda p: p["Year"])
 
 
+def tax_rates() -> list[dict]:
+    """City of Regina property tax rates by year, from config/tax-rates.json (typed in from the yearly Property Tax Bylaw).
+
+    'res' and 'com' are the City + Library tax in dollars on each $100,000 of assessed value (mills x factor x 100).
+    'reset' marks a year when the class multipliers changed, which is when the City re-sets every property's assessed
+    value; rates are only comparable to the years either side of a reset with care.
+    A typo stops the build (nothing is guessed)."""
+    cfg = json.loads((ROOT / "config" / "tax-rates.json").read_text(encoding="utf-8"))
+    years, out, problems = cfg["years"], [], []
+    for i, y in enumerate(years):
+        where = f"config/tax-rates.json, {y.get('year')}"
+        for k in ("city", "library", "bid_downtown", "bid_warehouse"):
+            if not isinstance(y.get(k), (int, float)) or not 0 < y[k] < 100:
+                problems.append(f"{where}: '{k}' must be a number of mills (like 11.0514)")
+        f = y.get("factors", {})
+        for k in ("residential", "multi_family", "commercial", "golf"):
+            if not isinstance(f.get(k), (int, float)) or not 0.3 < f[k] < 3:
+                problems.append(f"{where}: factor '{k}' must be a number around 1 (like 0.88032)")
+        if i and y.get("year") != years[i - 1].get("year", 0) + 1:
+            problems.append(f"{where}: years must run one after another with none missing")
+    if problems:
+        raise SystemExit("The tax rates file has mistakes:\n  " + "\n  ".join(problems))
+    for i, y in enumerate(years):
+        base, f = y["city"] + y["library"], y["factors"]
+        out.append({
+            "y": y["year"], "bylaw": y["bylaw"], "city": y["city"], "lib": y["library"], "bid_dt": y["bid_downtown"], "bid_wh": y["bid_warehouse"],
+            "f_res": f["residential"], "f_multi": f["multi_family"], "f_com": f["commercial"], "f_golf": f["golf"],
+            "res": round(base * f["residential"] * 100, 2), "com": round(base * f["commercial"] * 100, 2),
+            "reset": bool(i and years[i - 1]["factors"]["residential"] != f["residential"]),
+        })
+    return out
+
+
 def _tokens(kind: str) -> set[str]:
     """The {numbers} the map can fill in, read from the marker comments in the template (so the two never drift apart)."""
     text = (TEMPLATES / "lab_map.html").read_text(encoding="utf-8")
@@ -168,6 +201,7 @@ def main() -> None:
     ramp_words = re.compile(r"(onr|offr|crsrd|cnr|entr|ex|ramp|connector)", re.I)  # highway ramps and cross-road tags clutter the map
     roads["labels"] = [lb for lb in roads["labels"] if not ramp_words.search(lb["n"])]
     pop, rent, mig = series("population"), series("rental_market"), series("migration")
+    tax = tax_rates()
     first = min(r["date"] for r in rows_all)
     meta = {
         "latest": last.isoformat(), "built": date.today().isoformat(), "bounds": bounds, "groups": [{"key": k, "label": v} for k, v in o.GROUPS],
@@ -176,13 +210,15 @@ def main() -> None:
             "permits": last.isoformat(), "permits_start": first.isoformat(), "zoning": _latest_snapshot("zoning"), "applications": _latest_snapshot("proposed_development"),
             "population": pop[-1]["Release Date"], "population_year": pop[-1]["Year"], "rent_year": rent[-1]["Year"], "migration_year": mig[-1]["Year"],
             "rezoning_baseline": min((e["baseline"] for e in events), default=""),
+            "tax_first_year": tax[0]["y"], "tax_year": tax[-1]["y"],
         },
         "schema": 1, "unplotted": sum(1 for p in mp if p["lon"] is None), "total_permits": len(mp),
     }
     data = {"meta": meta, "content": load_content({k for k, _ in o.GROUPS}), "permits": mp, "zoning": zoning, "communities": ca, "roads": roads, "rezonings": events, "applications": apps,
             "series": {"population": [{"y": p["Year"], "v": p["Population"]} for p in pop],
                        "rent": [{"y": r["Year"], "rent": r["Average Rent"], "vac": r["Vacancy Rate"]} for r in rent],
-                       "migration": [{"y": m["Year"], "births": m["Births"], "deaths": m["Deaths"], "imm": m["Immigrants"], "inter": m["Net Interprovincial Migration"]} for m in mig]}}
+                       "migration": [{"y": m["Year"], "births": m["Births"], "deaths": m["Deaths"], "imm": m["Immigrants"], "inter": m["Net Interprovincial Migration"]} for m in mig],
+                       "tax": tax}}
     html = (TEMPLATES / "lab_map.html").read_text(encoding="utf-8")
     html = html.replace("/*__LEAFLET_CSS__*/", (TEMPLATES / "vendor" / "leaflet.css").read_text(encoding="utf-8"))
     html = html.replace("/*__LEAFLET_JS__*/", (TEMPLATES / "vendor" / "leaflet.js").read_text(encoding="utf-8"))

@@ -81,5 +81,17 @@ These use the last 12 months ("12m"), everything since 2020 ("all"), or Regina-w
 | `{pop_first}`, `{pop_first_year}`, `{pop_last}`, `{pop_last_year}`, `{pop_growth_pct}` | Regina's population then and now, and the growth in per cent (Statistics Canada) |
 | `{rent_last}`, `{rent_last_year}`, `{rent_first}`, `{rent_first_year}`, `{vacancy_last}` | average rent then and now, and the latest vacancy rate (CMHC) |
 | `{rezonings}`, `{applications}`, `{open_applications}` | rezoning and application counts |
+| `{tax_year}`, `{tax_res_100k}`, `{tax_com_100k}`, `{tax_com_more_pct}` | the latest tax year, the City + Library tax on each $100,000 of assessed value for homes and for commercial and industrial property, and how many per cent more the commercial rate is |
 
 Need a number that isn't here (for example "permits in Harbour Landing")? Ask Claude to add it to the map's code. It is a small change, but it needs a new download of the map for the number to exist. Once it exists, you can use it in any fact from then on without another download.
+
+## Adding next year's property tax rates
+
+The tax chart reads `config/tax-rates.json`. Each spring, when City Council passes the year's Property Tax Bylaw, add one entry at the end of the list. Copy the last entry and change the numbers to match the bylaw (find it on openregina.ca by searching "Regina Property Tax Bylaw"):
+
+* `year` and `bylaw` (for example 2027 and "2027-24"), and the link to the bylaw's page.
+* `city` and `library`: the two mill rates in section 4(1).
+* `bid_downtown` and `bid_warehouse`: the two business improvement district rates in section 4(2).
+* `factors`: the mill rate factors in section 6 (residential, multi_family, commercial, golf).
+
+Years must follow one after another with none missing. A typo, a missing year or a number that looks wrong stops the build with a message and the last good map stays live. The map sorts out which years are assessment resets by itself (the years the multipliers change).

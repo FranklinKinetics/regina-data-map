@@ -1,0 +1,29 @@
+{
+  "_about": "City of Regina property tax rates, typed in from the yearly Property Tax Bylaw (City Clerk, on openregina.ca). One entry per year. When Council passes a new bylaw each spring, add the next year at the end (see CONTENT-GUIDE.md). 'mills' means dollars of tax per $1,000 of assessed value. 'factors' are multiplied by the mills to get the rate for a type of property. Education tax (set by the Province) is not included.",
+  "years": [
+    {"year": 2019, "bylaw": "2019-23", "city": 8.10810, "library": 0.73285, "bid_downtown": 0.5997, "bid_warehouse": 0.50396,
+     "factors": {"residential": 0.91152, "multi_family": 0.91152, "commercial": 1.21040, "golf": 0.78654},
+     "url": "https://openregina.ca/dataset/bylaw-no-2019-23-the-regina-property-tax-bylaw-2019"},
+    {"year": 2020, "bylaw": "2020-23", "city": 8.37161, "library": 0.74971, "bid_downtown": 0.5997, "bid_warehouse": 0.50396,
+     "factors": {"residential": 0.91152, "multi_family": 0.91152, "commercial": 1.21040, "golf": 0.78654},
+     "url": "https://openregina.ca/dataset/bylaw-no-2020-23-the-regina-property-tax-bylaw-2020"},
+    {"year": 2021, "bylaw": "2021-27", "city": 9.45130, "library": 0.85098, "bid_downtown": 0.7233, "bid_warehouse": 0.54573,
+     "factors": {"residential": 0.91034, "multi_family": 0.91034, "commercial": 1.2495, "golf": 0.81197},
+     "url": "https://openregina.ca/dataset/bylaw-no-2021-27-the-regina-property-tax-bylaw-2021"},
+    {"year": 2022, "bylaw": "2022-25", "city": 9.77264, "library": 0.87191, "bid_downtown": 0.7595, "bid_warehouse": 0.73674,
+     "factors": {"residential": 0.91034, "multi_family": 0.91034, "commercial": 1.2495, "golf": 0.81197},
+     "url": "https://openregina.ca/dataset/bylaw-no-2022-25-the-regina-property-tax-bylaw-2022"},
+    {"year": 2023, "bylaw": "2023-35", "city": 10.13130, "library": 0.89371, "bid_downtown": 0.7975, "bid_warehouse": 0.77358,
+     "factors": {"residential": 0.91034, "multi_family": 0.91034, "commercial": 1.2495, "golf": 0.81197},
+     "url": "https://openregina.ca/dataset/bylaw-no-2023-35-the-regina-property-tax-bylaw-2023"},
+    {"year": 2024, "bylaw": "2024-13", "city": 10.42004, "library": 0.91400, "bid_downtown": 0.8214, "bid_warehouse": 0.8214,
+     "factors": {"residential": 0.91034, "multi_family": 0.91034, "commercial": 1.2495, "golf": 0.81197},
+     "url": "https://openregina.ca/dataset/bylaw-no-2024-13-the-regina-property-tax-bylaw-2024"},
+    {"year": 2025, "bylaw": "2025-30", "city": 11.05140, "library": 0.99326, "bid_downtown": 0.92580, "bid_warehouse": 0.88810,
+     "factors": {"residential": 0.88032, "multi_family": 0.88032, "commercial": 1.33303, "golf": 0.86624},
+     "url": "https://openregina.ca/dataset/bylaw-no-2025-30-the-regina-property-tax-bylaw-2025"},
+    {"year": 2026, "bylaw": "2026-25", "city": 12.2560, "library": 1.08613, "bid_downtown": 0.9535, "bid_warehouse": 0.9325,
+     "factors": {"residential": 0.88032, "multi_family": 0.88032, "commercial": 1.33303, "golf": 0.86624},
+     "url": "https://openregina.ca/dataset/bylaw-no-2026-25-the-regina-property-tax-bylaw-2026"}
+  ]
+}
