@@ -76,7 +76,7 @@ def community_layer() -> dict:
         gm["coordinates"] = o._round_coords(gm["coordinates"])
         feats.append({"type": "Feature", "geometry": gm, "properties": {
             "name": _titlecase(p["Community Association"]), "key": p["Community Association"].title(), "pop": p.get("Estimated Population (2021)"),
-            "income": p.get("Median Household Income"), "shelter": p.get("Pct Spending 30 Plus On Shelter"),
+            "income": p.get("Median Household Income"), "shelter": p.get("Pct Spending 30 Plus On Shelter"), "dwelling": p.get("Median Dwelling Value"),
         }})
     return {"type": "FeatureCollection", "features": feats}
 

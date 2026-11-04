@@ -317,6 +317,7 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
             <label><input type="radio" name="shade" value="zoning" checked>Zoning</label>
             <label><input type="radio" name="shade" value="income">Income</label>
             <label><input type="radio" name="shade" value="shelter">Housing costs</label>
+            <label><input type="radio" name="shade" value="homevalue">Home values</label>
             <label><input type="radio" name="shade" value="building">Building per person</label>
           </div>
           <div class="legend" id="legend" style="margin-top:10px"></div>
@@ -367,7 +368,7 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
           <details class="more-info" open><summary>What a building permit is</summary><p>The City issues a permit before most construction, demolition or major renovation can start. Each dot is one permit at the property it covers. A permit means the work is approved to begin. It does not mean the work is finished, or that it will go ahead on the declared budget.</p></details>
           <details class="more-info"><summary>What "declared value" means</summary><p>The applicant's own estimate of construction cost when they apply. It is not an appraisal, a sale price or the final cost. Some projects are declared in stages, so one building can appear in more than one permit.</p></details>
           <details class="more-info"><summary>Zoning, rezonings and open applications</summary><p>Zoning sets what can be built on land. "Urban holding" land is set aside for future development and usually needs a rezoning first. Diamonds mark places where the City's zoning map changed since our first snapshot. Circles are applications the City currently lists on its Proposed Development page; orange ones are open for public comment.</p></details>
-          <details class="more-info"><summary>Income and housing-cost shading</summary><p>These come from the 2021 Census (Statistics Canada). The Census does not publish figures for community associations, so each figure is an estimate built from the census blocks that overlap each area. Treat it as a good guide, not a precise count.</p></details>
+          <details class="more-info"><summary>Income, housing-cost and home-value shading</summary><p>Home value is the median value owners gave for their own home in the 2021 Census. It is not a City assessment or a sale price, and 2021 values are older than today's market. These come from the 2021 Census (Statistics Canada). The Census does not publish figures for community associations, so each figure is an estimate built from the census blocks that overlap each area. Treat it as a good guide, not a precise count.</p></details>
           <details class="more-info"><summary>Known gaps</summary><ul id="gaps"></ul></details>
         </div>
         <div class="sec"><h2>Where the data comes from</h2><ul id="sources" style="padding-left:18px;margin:0;font-size:0.86rem"></ul></div>
@@ -443,6 +444,8 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
       note: "Estimated median household income by community association, 2021 Census (Statistics Canada). Click an area for its figures." },
     shelter: { field: "shelter", cuts: [15, 20, 25, 30], labels: ["Under 15%", "15% to 20%", "20% to 25%", "25% to 30%", "30% and up"],
       note: "Share of households spending 30% or more of income on housing, 2021 Census (Statistics Canada), estimated by community association." },
+    homevalue: { field: "dwelling", cuts: [250000, 300000, 350000, 400000], labels: ["Under $250K", "$250K to $300K", "$300K to $350K", "$350K to $400K", "$400K and up"],
+      note: "Typical home value (what owners said their home would sell for), 2021 Census (Statistics Canada), estimated by community association. It is the owners' own estimate in 2021, not a City assessment or a sale price." },
     building: { note: "Declared construction value of the permits showing, divided by each area's 2021 population. Darker is quieter, orange is busier. The ranking follows your dates and filters, and a longer stretch of time adds up, so compare areas within one view." },
   };
   const DEFAULTS = () => ({ mode: "snap", span: 365, snap: M.latest, from: addDays(M.latest, -364), to: M.latest });
@@ -463,7 +466,7 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
     "City of Regina, Building Permit Report. Permits issued " + fmtDate(A.permits_start) + " to " + fmtDate(A.permits) + "; the date controls pick any stretch of that time (the map opens on the last 12 months). Updated by the City each Thursday.",
     "City of Regina Open Data: Zoning and Land Use districts (snapshot " + fmtDate(A.zoning) + "), Road Centerline, Address Points, Parcels and Community Associations (ArcGIS open data services).",
     "City of Regina, Proposed Development notices (snapshot " + fmtDate(A.applications) + "). Rezonings are spotted by comparing the City's own zoning snapshots, so only changes since " + fmtDate(A.rezoning_baseline || "2026-07-26") + " show.",
-    "Statistics Canada: population estimates for July 1, " + A.population_year + " (Table 17-10-0155-01, released " + fmtDate(A.population) + "); components of population change to " + A.migration_year + " (Table 17-10-0149-01); 2021 Census income and shelter-cost data.",
+    "Statistics Canada: population estimates for July 1, " + A.population_year + " (Table 17-10-0155-01, released " + fmtDate(A.population) + "); components of population change to " + A.migration_year + " (Table 17-10-0149-01); 2021 Census income, shelter-cost and home-value data.",
     "Canada Mortgage and Housing Corporation (CMHC), Rental Market Survey, Regina, to " + A.rent_year + ".",
   ].concat(A.tax_year ? ["City of Regina, Property Tax Bylaws " + A.tax_first_year + " to " + A.tax_year + " (City Clerk, on the City's open data site): mill rates and mill rate factors. The map does not show anyone's assessed value or tax bill."] : []).map((s) => "<li>" + esc(s) + "</li>").join("");
   $("gaps").innerHTML = [
@@ -565,7 +568,7 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   function caPopup(p) {
     const s = caStats[p.key] || { n: 0, v: 0 };
     return '<b class="t">' + esc(p.name) + '</b><span class="pp-m">Community association &middot; about ' + num(p.pop || 0) + " people (2021)</span>" +
-      "<div style='margin-top:6px'>Median household income <b>" + (p.income ? money(p.income) : "n/a") + "</b><br>Spending 30%+ of income on housing <b>" + (p.shelter != null ? p.shelter + "%" : "n/a") + "</b></div>" +
+      "<div style='margin-top:6px'>Median household income <b>" + (p.income ? money(p.income) : "n/a") + "</b><br>Spending 30%+ of income on housing <b>" + (p.shelter != null ? p.shelter + "%" : "n/a") + "</b><br>Typical home value (owners' estimate) <b>" + (p.dwelling ? money(p.dwelling) : "n/a") + "</b></div>" +
       "<div class='pp-m'>Estimates from the 2021 Census.</div><div style='margin-top:6px'>Permits showing: <b>" + num(s.n) + "</b> worth <b>" + short(s.v) + "</b></div>";
   }
   function binColor(v, cuts) { if (v == null) return "#3b3b3f"; let i = 0; while (i < cuts.length && v >= cuts[i]) i++; return RAMP[i]; }

@@ -750,6 +750,7 @@
         "Community Association": "HILLSDALE",
         "Estimated Population (2021)": 5410,
         "Median Household Income": 79416,
+        "Median Dwelling Value": 344000.0,
         "Pct Spending 30 Plus On Shelter": 24.3
       }
     },
@@ -998,6 +999,7 @@
         "Community Association": "HARBOUR LANDING",
         "Estimated Population (2021)": 13488,
         "Median Household Income": 105041,
+        "Median Dwelling Value": 395000.0,
         "Pct Spending 30 Plus On Shelter": 25.3
       }
     },
@@ -1238,6 +1240,7 @@
         "Community Association": "WHITMORE PARK",
         "Estimated Population (2021)": 6688,
         "Median Household Income": 102947,
+        "Median Dwelling Value": 344000.0,
         "Pct Spending 30 Plus On Shelter": 14.0
       }
     },
@@ -2578,6 +2581,7 @@
         "Community Association": "ROSEMONT/MOUNT ROYAL",
         "Estimated Population (2021)": 8875,
         "Median Household Income": 81901,
+        "Median Dwelling Value": 268000.0,
         "Pct Spending 30 Plus On Shelter": 17.8
       }
     },
@@ -2894,6 +2898,7 @@
         "Community Association": "NORTH CENTRAL",
         "Estimated Population (2021)": 9210,
         "Median Household Income": 55533,
+        "Median Dwelling Value": 167000.0,
         "Pct Spending 30 Plus On Shelter": 29.6
       }
     },
@@ -3110,6 +3115,7 @@
         "Community Association": "MCNAB",
         "Estimated Population (2021)": 1596,
         "Median Household Income": 65799,
+        "Median Dwelling Value": 250000.0,
         "Pct Spending 30 Plus On Shelter": 29.8
       }
     },
@@ -3422,6 +3428,7 @@
         "Community Association": "AL RITCHIE",
         "Estimated Population (2021)": 7594,
         "Median Household Income": 70689,
+        "Median Dwelling Value": 251000.0,
         "Pct Spending 30 Plus On Shelter": 21.0
       }
     },
@@ -3918,6 +3925,7 @@
         "Community Association": "ARGYLE NORTH",
         "Estimated Population (2021)": 7995,
         "Median Household Income": 97737,
+        "Median Dwelling Value": 359000.0,
         "Pct Spending 30 Plus On Shelter": 15.2
       }
     },
@@ -4150,6 +4158,7 @@
         "Community Association": "NORMANVIEW RESIDENTS GROUP",
         "Estimated Population (2021)": 3945,
         "Median Household Income": 86472,
+        "Median Dwelling Value": 310000.0,
         "Pct Spending 30 Plus On Shelter": 18.9
       }
     },
@@ -4414,6 +4423,7 @@
         "Community Association": "CATHEDRAL VILLAGE",
         "Estimated Population (2021)": 7265,
         "Median Household Income": 77781,
+        "Median Dwelling Value": 311000.0,
         "Pct Spending 30 Plus On Shelter": 26.9
       }
     },
@@ -4578,6 +4588,7 @@
         "Community Association": "BOOTHILL",
         "Estimated Population (2021)": 2459,
         "Median Household Income": 91694,
+        "Median Dwelling Value": 320000.0,
         "Pct Spending 30 Plus On Shelter": 17.6
       }
     },
@@ -4706,6 +4717,7 @@
         "Community Association": "DEWDNEY EAST",
         "Estimated Population (2021)": 17931,
         "Median Household Income": 93839,
+        "Median Dwelling Value": 297000.0,
         "Pct Spending 30 Plus On Shelter": 13.3
       }
     },
@@ -4942,6 +4954,7 @@
         "Community Association": "ALBERT PARK",
         "Estimated Population (2021)": 12564,
         "Median Household Income": 90029,
+        "Median Dwelling Value": 358000.0,
         "Pct Spending 30 Plus On Shelter": 21.9
       }
     },
@@ -5050,6 +5063,7 @@
         "Community Association": "QUEEN CITY EASTVIEW",
         "Estimated Population (2021)": 841,
         "Median Household Income": 70658,
+        "Median Dwelling Value": 236000.0,
         "Pct Spending 30 Plus On Shelter": 22.7
       }
     },
@@ -5174,6 +5188,7 @@
         "Community Association": "REGENT PARK",
         "Estimated Population (2021)": 2800,
         "Median Household Income": 87784,
+        "Median Dwelling Value": 272000.0,
         "Pct Spending 30 Plus On Shelter": 14.6
       }
     },
@@ -5462,6 +5477,7 @@
         "Community Association": "UPLANDS",
         "Estimated Population (2021)": 5328,
         "Median Household Income": 102688,
+        "Median Dwelling Value": 319000.0,
         "Pct Spending 30 Plus On Shelter": 4.7
       }
     },
@@ -5598,6 +5614,7 @@
         "Community Association": "WALSH ACRES/LAKERIDGE/GARDEN RIDGE",
         "Estimated Population (2021)": 10973,
         "Median Household Income": 124759,
+        "Median Dwelling Value": 402000.0,
         "Pct Spending 30 Plus On Shelter": 10.8
       }
     },
@@ -6102,6 +6119,7 @@
         "Community Association": "TWIN LAKES",
         "Estimated Population (2021)": 6676,
         "Median Household Income": 129339,
+        "Median Dwelling Value": 422000.0,
         "Pct Spending 30 Plus On Shelter": 12.8
       }
     },
@@ -6650,6 +6668,7 @@
         "Community Association": "SHERWOOD/MCCARTHY",
         "Estimated Population (2021)": 5850,
         "Median Household Income": 93085,
+        "Median Dwelling Value": 300000.0,
         "Pct Spending 30 Plus On Shelter": 13.7
       }
     },
@@ -6782,6 +6801,7 @@
         "Community Association": "NORTHEAST",
         "Estimated Population (2021)": 6868,
         "Median Household Income": 65595,
+        "Median Dwelling Value": 240000.0,
         "Pct Spending 30 Plus On Shelter": 25.2
       }
     },
@@ -6918,6 +6938,7 @@
         "Community Association": "CORONATION PARK",
         "Estimated Population (2021)": 7189,
         "Median Household Income": 76487,
+        "Median Dwelling Value": 284000.0,
         "Pct Spending 30 Plus On Shelter": 17.9
       }
     },
@@ -7126,6 +7147,7 @@
         "Community Association": "NORMANVIEW WEST",
         "Estimated Population (2021)": 2818,
         "Median Household Income": 99786,
+        "Median Dwelling Value": 300000.0,
         "Pct Spending 30 Plus On Shelter": 11.7
       }
     },
@@ -7222,6 +7244,7 @@
         "Community Association": "PRAIRIE VIEW",
         "Estimated Population (2021)": 8555,
         "Median Household Income": 129609,
+        "Median Dwelling Value": 424000.0,
         "Pct Spending 30 Plus On Shelter": 11.3
       }
     },
@@ -8370,6 +8393,7 @@
         "Community Association": "DIEPPE-WESTERRA",
         "Estimated Population (2021)": 1914,
         "Median Household Income": 90289,
+        "Median Dwelling Value": 314000.0,
         "Pct Spending 30 Plus On Shelter": 15.7
       }
     },
@@ -9686,6 +9710,7 @@
         "Community Association": "ARCOLA EAST",
         "Estimated Population (2021)": 30407,
         "Median Household Income": 132772,
+        "Median Dwelling Value": 469000.0,
         "Pct Spending 30 Plus On Shelter": 13.3
       }
     },
@@ -9790,6 +9815,7 @@
         "Community Association": "DOWNTOWN",
         "Estimated Population (2021)": 3410,
         "Median Household Income": 38071,
+        "Median Dwelling Value": 252000.0,
         "Pct Spending 30 Plus On Shelter": 36.4
       }
     },
@@ -9990,6 +10016,7 @@
         "Community Association": "HERITAGE",
         "Estimated Population (2021)": 4759,
         "Median Household Income": 52258,
+        "Median Dwelling Value": 214000.0,
         "Pct Spending 30 Plus On Shelter": 29.9
       }
     },
@@ -10278,6 +10305,7 @@
         "Community Association": "LAKEVIEW",
         "Estimated Population (2021)": 7880,
         "Median Household Income": 105161,
+        "Median Dwelling Value": 370000.0,
         "Pct Spending 30 Plus On Shelter": 13.4
       }
     }
