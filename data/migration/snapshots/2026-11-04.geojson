@@ -1,0 +1,185 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2010,
+        "Births": 2898,
+        "Deaths": 1697,
+        "Immigrants": 2586,
+        "Net Interprovincial Migration": -61,
+        "Net Intraprovincial Migration": 628
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2011,
+        "Births": 2940,
+        "Deaths": 1654,
+        "Immigrants": 4054,
+        "Net Interprovincial Migration": 366,
+        "Net Intraprovincial Migration": 305
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2012,
+        "Births": 3046,
+        "Deaths": 1740,
+        "Immigrants": 3475,
+        "Net Interprovincial Migration": -88,
+        "Net Intraprovincial Migration": 283
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2013,
+        "Births": 3120,
+        "Deaths": 1746,
+        "Immigrants": 3966,
+        "Net Interprovincial Migration": -662,
+        "Net Intraprovincial Migration": 694
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2014,
+        "Births": 3149,
+        "Deaths": 1709,
+        "Immigrants": 3621,
+        "Net Interprovincial Migration": -1312,
+        "Net Intraprovincial Migration": 629
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2015,
+        "Births": 3342,
+        "Deaths": 1764,
+        "Immigrants": 4656,
+        "Net Interprovincial Migration": -1282,
+        "Net Intraprovincial Migration": 467
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2016,
+        "Births": 3234,
+        "Deaths": 1725,
+        "Immigrants": 4798,
+        "Net Interprovincial Migration": -1852,
+        "Net Intraprovincial Migration": 1256
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2017,
+        "Births": 3208,
+        "Deaths": 1782,
+        "Immigrants": 5434,
+        "Net Interprovincial Migration": -2718,
+        "Net Intraprovincial Migration": 946
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2018,
+        "Births": 3131,
+        "Deaths": 1830,
+        "Immigrants": 4888,
+        "Net Interprovincial Migration": -3250,
+        "Net Intraprovincial Migration": 1023
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2019,
+        "Births": 3113,
+        "Deaths": 1914,
+        "Immigrants": 4365,
+        "Net Interprovincial Migration": -3811,
+        "Net Intraprovincial Migration": 815
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2020,
+        "Births": 2994,
+        "Deaths": 2163,
+        "Immigrants": 2378,
+        "Net Interprovincial Migration": -2597,
+        "Net Intraprovincial Migration": 624
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2021,
+        "Births": 2837,
+        "Deaths": 2211,
+        "Immigrants": 5681,
+        "Net Interprovincial Migration": -3893,
+        "Net Intraprovincial Migration": 253
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2022,
+        "Births": 2772,
+        "Deaths": 2153,
+        "Immigrants": 9586,
+        "Net Interprovincial Migration": -3193,
+        "Net Intraprovincial Migration": 387
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2023,
+        "Births": 2703,
+        "Deaths": 2154,
+        "Immigrants": 8732,
+        "Net Interprovincial Migration": -1848,
+        "Net Intraprovincial Migration": 298
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "Year": 2024,
+        "Births": 2713,
+        "Deaths": 2174,
+        "Immigrants": 6447,
+        "Net Interprovincial Migration": -1689,
+        "Net Intraprovincial Migration": 265
+      }
+    }
+  ]
+}
