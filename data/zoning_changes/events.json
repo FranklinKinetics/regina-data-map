@@ -94,5 +94,29 @@
     ],
     "baseline_snapshot": "2026-07-26",
     "first_detected": "2026-10-25"
+  },
+  {
+    "event_id": "zoning-1859",
+    "kind": "polygon expanded",
+    "zoning_from": "MLM",
+    "zoning_to": "MH",
+    "zoning_to_description": "Mixed High-Rise",
+    "bylaw_number": null,
+    "community_association": "ARGYLE NORTH",
+    "ward": "10",
+    "lon": -104.635074,
+    "lat": 50.498162,
+    "nearest_address": "3800 Rochdale Boulevard",
+    "approx_area_m2": 38769,
+    "linked_applications": [
+      {
+        "file_number": "PL202600238",
+        "address": "3800 Rochdale Boulevard",
+        "application_type": "Zoning Bylaw Amendment",
+        "description": "Rezone a portion of the Subject Property from MLM - Mixed Large Market to MH - Mixed High-Rise Zone"
+      }
+    ],
+    "baseline_snapshot": "2026-11-03",
+    "first_detected": "2026-11-04"
   }
 ]
