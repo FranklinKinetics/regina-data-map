@@ -12,6 +12,8 @@ on:
     paths:
       - config/lab-content.json
       - config/tax-rates.json
+      - config/site.json
+      - .github/workflows/refresh.yml
       - templates/**
       - scripts/build_lab_map.py
       - scripts/export_open_data.py
