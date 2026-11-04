@@ -14,8 +14,15 @@ Government open data only:
 
 No company, applicant or owner names are published here. Names in the City's permit file are removed before anything is saved to this repository.
 
-## Edit the words
+## Live map, and make it your own
 
+* **Browse it:** https://franklinkinetics.github.io/regina-data-map/ (no download, works on a phone).
+* **Save a copy:** the live map has a **Save a copy of this map** button (Explore tab, "Take it with you"). The saved file is the whole map in one page: open it in a browser, edit it in a text editor or with an AI assistant, host it anywhere. It keeps checking this site for newer data when it is online.
+* **Fork it:** click **Fork** on GitHub to get your own copy of the whole pipeline (weekly data refresh, map build, your own live page). The code is MIT-licensed ([`LICENSE`](LICENSE)); the data keeps its own licences, so keep the attribution the map shows.
+
+## Use the data yourself
+
+* **Download files** (no sign-up, no code): `https://franklinkinetics.github.io/regina-data-map/data/` has `permits.csv`, `permits.geojson`, `rezonings.json`, `applications.json`, `context.json` and a `data-dictionary.json`. Rebuilt every Friday.
 * **Change the words on the map** (stories, facts, opening message) without a new download: see [`CONTENT-GUIDE.md`](CONTENT-GUIDE.md).
 
 ## How the weekly refresh works
@@ -26,7 +33,7 @@ No company, applicant or owner names are published here. Names in the City's per
 2. `python -m scripts.build_lab_map` builds the map file and `latest-v1.json`, the data file that downloaded maps look for.
 3. A sanity check confirms the new data file looks right.
 4. `python -m scripts.prune_state` removes applicant names and trims the saved state, which is then committed back here for next week's comparison (this is how rezonings are spotted).
-5. The map and `latest-v1.json` are published to GitHub Pages.
+5. The map, `latest-v1.json` and the download files in `data/` are published to GitHub Pages.
 
 The same refresh also runs whenever `config/lab-content.json` (the words on the map) or the map's code changes.
 

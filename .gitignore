@@ -5,3 +5,6 @@ site/
 lab-02/
 data/roads/
 data/run_log.jsonl
+mcp/src/*.egg-info/
+mcp/build/
+*.egg-info/

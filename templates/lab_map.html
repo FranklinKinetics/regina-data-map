@@ -338,6 +338,11 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
           <p class="note">Dot size follows declared value. Dot colour follows the type of work.</p>
           <div class="row" style="margin-top:10px"><button type="button" class="btn" id="copy">Copy a link to this view</button><a class="btn" id="full" href="#" target="_blank" rel="noopener" hidden>Open full screen</a></div>
         </div>
+        <div class="sec" id="take" hidden><h2>Take it with you</h2>
+          <p class="hint">The permit data is free to use, and so is the map itself.</p>
+          <div class="row"><button type="button" class="btn primary" id="save-copy" hidden>Save a copy of this map</button><a class="btn" id="get-csv" href="#" target="_blank" rel="noopener">Permit data (CSV)</a><a class="btn" id="get-live" href="#" target="_blank" rel="noopener" hidden>Open the live map</a></div>
+          <p class="note" id="take-note"></p>
+        </div>
       </div>
 
       <div class="tabpanel" id="p-places" role="tabpanel" aria-labelledby="tab-places" hidden>
@@ -1019,8 +1024,25 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, () => window.prompt("Copy this link:", url)); else window.prompt("Copy this link:", url);
   });
 
+  // "Take it with you": the live address, the CSV and (on the live page) a button that saves the whole map as one file
+  (function take() {
+    const hosted = /^https?:$/.test(location.protocol), base = DATA_URL ? DATA_URL.replace(/[^/]*$/, "") : hosted ? location.href.split("#")[0].replace(/[^/]*$/, "") : "";
+    if (!base || embedded) return;
+    $("take").hidden = false; $("get-csv").href = base + "data/permits.csv";
+    if (hosted) {
+      $("save-copy").hidden = false;
+      $("take-note").textContent = "The saved file is the whole map in one page. Open it in any browser, or edit it in a text editor or with an AI assistant. It keeps checking for newer data when it is online.";
+      $("save-copy").addEventListener("click", () => {
+        fetch(location.href.split("#")[0]).then((r) => r.blob()).then((b) => {
+          const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "regina-data-map.html"; document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+        }).catch(() => { $("take-note").textContent = "Couldn't save it from here. Right-click the page and choose Save as."; });
+      });
+    } else { $("get-live").hidden = false; $("get-live").href = base; $("take-note").textContent = "The live map has the newest data and can be shared by link. This saved copy also checks for newer data when it is online."; }
+  })();
+
   // tabs
-  const TABS = ["explore", "places", "numbers", "about"];
+  const TABS =["explore", "places", "numbers", "about"];
   function showTab(name) {
     TABS.forEach((t) => { const on = t === name; $("tab-" + t).setAttribute("aria-selected", on ? "true" : "false"); $("tab-" + t).tabIndex = on ? 0 : -1; $("p-" + t).hidden = !on; });
   }
