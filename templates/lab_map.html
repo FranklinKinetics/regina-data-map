@@ -489,7 +489,8 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   map.attributionControl.setPrefix(false);
   map.attributionControl.addAttribution("Open Government Licence &ndash; City of Regina &middot; Statistics Canada &middot; CMHC");
   const bnd = M.bounds;
-  const fitCity = () => map.fitBounds([[bnd[1], bnd[0]], [bnd[3], bnd[2]]], { animate: !reduced });
+  let still = false; // true while a shared link is being applied: jump to the view, no animation
+  const fitCity = () => map.fitBounds([[bnd[1], bnd[0]], [bnd[3], bnd[2]]], { animate: !reduced && !still });
   fitCity();
   map.setMaxBounds([[bnd[1] - 0.15, bnd[0] - 0.25], [bnd[3] + 0.15, bnd[2] + 0.25]]);
   map.createPane("shade").style.zIndex = 300;
@@ -751,15 +752,20 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
     setGroups(null); setControls(); $("t-permits").checked = true; $("t-events").checked = true; $("t-roads").checked = true;
     eventLayer.addTo(map); roadLayer.addTo(map); syncRoadNames(); document.querySelector('#shade input[value="zoning"]').checked = true; storyButtons(); hideCaption();
   }
-  function runStory(id) {
-    const s = STORIES.find((x) => x.id === id); if (!s) return;
-    if (state.story === id) { resetAll(); refresh(); fitCity(); return; }
+  const storyById = (id) => STORIES.find((x) => x.id === id);
+  function storyFit(s) {
+    if (s.events) { const pts = D.rezonings.map((r) => [r.lat, r.lon]).concat(D.applications.filter((a) => a.lon != null).map((a) => [a.lat, a.lon])); if (pts.length) map.fitBounds(L.latLngBounds(pts).pad(0.35), { maxZoom: 14, animate: !reduced && !still }); }
+    else fitCity();
+  }
+  function storyCaption() { const s = storyById(state.story); if (!s) return; const [t, p] = s.cap(current); caption(t, p); }
+  // A click and a shared link (#story=id) both come through here. A second click on the active story turns it off; a link (force) never does.
+  function runStory(id, force) {
+    const s = storyById(id); if (!s) return;
+    if (state.story === id && !force) { resetAll(); refresh(); fitCity(); return; }
     resetAll(); state.story = id; setGroups(s.groups); if (s.min) state.min = s.min; if (s.span) state.span = s.span;
     if (s.events) { $("t-permits").checked = false; }
     setControls(); storyButtons(); refresh();
-    if (s.events) { const pts = D.rezonings.map((r) => [r.lat, r.lon]).concat(D.applications.filter((a) => a.lon != null).map((a) => [a.lat, a.lon])); if (pts.length) map.fitBounds(L.latLngBounds(pts).pad(0.35), { maxZoom: 14, animate: !reduced }); }
-    else fitCity();
-    const [t, p] = s.cap(current); caption(t, p);
+    storyFit(s); storyCaption();
   }
   $("stories").addEventListener("click", (e) => { const b = e.target.closest("[data-story]"); if (b) runStory(b.dataset.story); });
 
@@ -1011,13 +1017,13 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   // ---------------------------------------------------------------- wiring
   $("chips").addEventListener("change", (e) => { e.target.checked ? state.groups.add(e.target.value) : state.groups.delete(e.target.value); state.story = ""; storyButtons(); refresh(); });
   $("f-value").addEventListener("change", (e) => { state.min = +e.target.value; state.story = ""; storyButtons(); refresh(); });
-  $("f-hood").addEventListener("change", (e) => { if (e.target.value) spotlight(e.target.value); else { setHood(""); fitCity(); } });
+  $("f-hood").addEventListener("change", (e) => { if (e.target.value) spotlight(e.target.value); else { touched(); setHood(""); fitCity(); } });
   let qTimer;
-  $("f-q").addEventListener("input", (e) => { clearTimeout(qTimer); qTimer = setTimeout(() => { state.q = e.target.value.trim().toLowerCase(); refresh(); }, 150); });
-  $("t-permits").addEventListener("change", () => refresh());
-  $("t-events").addEventListener("change", (e) => { e.target.checked ? eventLayer.addTo(map) : map.removeLayer(eventLayer); writeHash(); });
-  $("t-roads").addEventListener("change", (e) => { e.target.checked ? roadLayer.addTo(map) : map.removeLayer(roadLayer); syncRoadNames(); writeHash(); });
-  $("shade").addEventListener("change", (e) => { state.shade = e.target.value; refresh(); });
+  $("f-q").addEventListener("input", (e) => { clearTimeout(qTimer); touched(); qTimer = setTimeout(() => { state.q = e.target.value.trim().toLowerCase(); refresh(); }, 150); });
+  $("t-permits").addEventListener("change", () => { touched(); refresh(); });
+  $("t-events").addEventListener("change", (e) => { touched(); e.target.checked ? eventLayer.addTo(map) : map.removeLayer(eventLayer); writeHash(); });
+  $("t-roads").addEventListener("change", (e) => { touched(); e.target.checked ? roadLayer.addTo(map) : map.removeLayer(roadLayer); syncRoadNames(); writeHash(); });
+  $("shade").addEventListener("change", (e) => { touched(); state.shade = e.target.value; refresh(); });
   document.querySelectorAll("th button").forEach((b) => b.addEventListener("click", () => { state.sort = b.dataset.sort; document.querySelectorAll("th button").forEach((x) => x.setAttribute("aria-pressed", x === b ? "true" : "false")); renderHoods(); }));
   $("hood-more").addEventListener("click", () => { state.showAll = !state.showAll; renderHoods(); });
   $("hood-body").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-n]"); if (tr) spotlight(tr.dataset.n); });
@@ -1113,6 +1119,7 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   // ---------------------------------------------------------------- share link
   function writeHash() {
     const h = [], all = M.groups.map((g) => g.key);
+    if (state.story && storyById(state.story)) h.push("story=" + state.story);
     if (state.mode === "range") h.push("from=" + state.from, "to=" + state.to);
     else { if (state.span !== 365) h.push("span=" + state.span); if (state.snap !== M.latest) h.push("snap=" + state.snap); }
     if (state.min) h.push("min=" + state.min);
@@ -1127,9 +1134,14 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
     try { history.replaceState(null, "", "#" + h.join("&")); } catch (e) { /* sandboxed frame: skip */ }
   }
   map.on("moveend", () => { clearTimeout(writeHash.t); writeHash.t = setTimeout(writeHash, 300); });
-  function readHash() {
+  let refit = null; // set when a story link has no map position of its own: fit the story once the map has its real size
+  // Apply the address hash. A story=id key runs the same code as clicking that story; every other key is applied after it, so a link can still adjust the view.
+  function applyHash() {
+    refit = null;
     const h = location.hash.replace(/^#/, ""); if (!h) return false;
-    const q = Object.fromEntries(h.split("&").map((x) => { const i = x.indexOf("="); return [x.slice(0, i), decodeURIComponent(x.slice(i + 1))]; }));
+    const q = Object.fromEntries(h.split("&").map((x) => { const i = x.indexOf("="); let v = x.slice(i + 1); try { v = decodeURIComponent(v); } catch (e) { /* keep it as typed */ } return [x.slice(0, i), v]; }));
+    if (Object.keys(q).every((k) => k === "story") && !storyById(q.story)) return false; // an unknown story id on its own: same as no link at all
+    if (q.story && storyById(q.story)) { still = true; try { runStory(q.story, true); } finally { still = false; } if (!q.v) { const s = storyById(q.story); refit = () => { still = true; try { storyFit(s); } finally { still = false; } }; } }
     if (isDay(q.from) && isDay(q.to)) { state.mode = "range"; state.from = clampDay(q.from); state.to = clampDay(q.to); if (state.to < state.from) state.to = state.from; }
     else { if (q.span != null && [0, 7, 30, 90, 365].includes(+q.span)) state.span = +q.span; if (isDay(q.snap)) state.snap = clampDay(q.snap); }
     if (q.min) state.min = +q.min; if (q.hood) state.hood = q.hood; if (q.q) state.q = q.q.toLowerCase();
@@ -1139,11 +1151,16 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
     if (q.v) { const [la, lo, z] = q.v.split(",").map(Number); if (isFinite(la) && isFinite(lo) && isFinite(z)) map.setView([la, lo], z, { animate: false }); }
     return true;
   }
-  const restored = readHash();
-  syncRoadNames(); refresh();
+  const restored = applyHash();
+  syncRoadNames(); refresh(); if (state.story) storyCaption();
+  // Changing the hash in an open tab (or a link that only differs after the #) switches views without a reload.
+  window.addEventListener("hashchange", () => {
+    resetAll(); still = true;
+    try { const any = applyHash(); syncRoadNames(); refresh(); if (state.story) storyCaption(); if (refit) refit(); else if (!any) fitCity(); } finally { still = false; }
+  });
   if (!restored) { const tk = storyTokens(YEAR); caption(fill(C.intro.title, tk).text, fill(C.intro.body, tk).text); introTimer = setTimeout(hideCaption, 12000); }
   window.addEventListener("resize", () => map.invalidateSize());
-  const settle = () => { map.invalidateSize(); if (!restored && !state.hood && !state.story) fitCity(); };
+  const settle = () => { map.invalidateSize(); if (refit) refit(); else if (!restored && !state.hood && !state.story) fitCity(); };
   requestAnimationFrame(settle); setTimeout(settle, 350);
   }
 })();
