@@ -14,6 +14,10 @@ Government open data only:
 
 No company, applicant or owner names are published here. Names in the City's permit file are removed before anything is saved to this repository.
 
+## Edit the words
+
+* **Change the words on the map** (stories, facts, opening message) without a new download: see [`CONTENT-GUIDE.md`](CONTENT-GUIDE.md).
+
 ## How the weekly refresh works
 
 `.github/workflows/refresh.yml` runs these steps, and stops at the first one that fails, which leaves the last good version live:
@@ -23,6 +27,8 @@ No company, applicant or owner names are published here. Names in the City's per
 3. A sanity check confirms the new data file looks right.
 4. `python -m scripts.prune_state` removes applicant names and trims the saved state, which is then committed back here for next week's comparison (this is how rezonings are spotted).
 5. The map and `latest-v1.json` are published to GitHub Pages.
+
+The same refresh also runs whenever `config/lab-content.json` (the words on the map) or the map's code changes.
 
 To run it by hand: open the **Actions** tab, choose **Refresh Regina Data Map**, press **Run workflow**.
 

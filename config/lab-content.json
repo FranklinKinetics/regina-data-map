@@ -1,0 +1,90 @@
+{
+  "_help": [
+    "This file controls the words on the Regina Data Map: the opening message, the six story buttons and the 'Did you know?' facts.",
+    "Edit it on GitHub (open the file, press the pencil icon, change the text, press 'Commit changes'). The next map refresh publishes it and every downloaded copy picks it up the next time it is opened online.",
+    "Words in {curly brackets} are filled in with live numbers every time the map opens, so they never go stale. Text inside [[double square brackets]] only appears if every {number} inside it exists.",
+    "Story 'show' options: groups (which types of work to show; leave out for all), min (smallest declared value in dollars), span (days of permits to show; 30 = last 30 days), events (true = show rezonings and applications instead of permits).",
+    "The full list of {numbers} you can use is in the repository file CONTENT-GUIDE.md. A fact that uses a number the map doesn't know is skipped."
+  ],
+  "version": 1,
+  "intro": {
+    "title": "Click anything",
+    "body": "Every dot is a building permit the City issued. Pick a story, slide through time since {first_year}, press play to watch Regina grow, or hit Surprise me."
+  },
+  "stories": [
+    {
+      "id": "homes",
+      "title": "Where are new homes going up?",
+      "sub": "New houses, apartments and townhouses",
+      "show": { "groups": ["new-homes", "new-multi"] },
+      "caption": {
+        "title": "{count} permits for new homes and apartment buildings",
+        "body": "Together they add about {homes} homes. The most: {top_hood_homes} ({top_hood_homes_n}). Click a dot to see what it is."
+      }
+    },
+    {
+      "id": "big",
+      "title": "The $10 million club",
+      "sub": "Only the biggest projects",
+      "show": { "min": 10000000 },
+      "caption": {
+        "title": "{count} projects of $10 million or more",
+        "body": "They add up to {value}, about {share_of_year}% of everything permitted this year.[[ The biggest: {biggest_what} at {biggest_address}, {biggest_value}.]]"
+      }
+    },
+    {
+      "id": "suites",
+      "title": "Suites and basements",
+      "sub": "A quiet way Regina adds housing",
+      "show": { "groups": ["suites"] },
+      "caption": {
+        "title": "{count} permits for secondary suites and basement developments",
+        "body": "Not new buildings, but new places to live in existing ones. Most in {top_hood_count} ({top_hood_count_n})."
+      }
+    },
+    {
+      "id": "month",
+      "title": "What's new this month",
+      "sub": "The last 30 days of permits",
+      "show": { "span": 30 },
+      "caption": {
+        "title": "{count} permits in the last 30 days",
+        "body": "{value} of declared construction value.[[ The biggest: {biggest_what} at {biggest_address}, {biggest_value}.]]"
+      }
+    },
+    {
+      "id": "commercial",
+      "title": "Shops, offices and factories",
+      "sub": "New commercial buildings and renovations",
+      "show": { "groups": ["new-commercial", "commercial-reno"] },
+      "caption": {
+        "title": "{count} commercial, industrial and institutional permits",
+        "body": "{value} declared. The most value: {top_hood_value}."
+      }
+    },
+    {
+      "id": "rezone",
+      "title": "Rezoned and proposed",
+      "sub": "Zoning changes and open City applications",
+      "show": { "events": true },
+      "caption": {
+        "title": "{rezonings} rezonings spotted, {applications} applications listed",
+        "body": "{open_applications} open for public comment right now. Diamonds are rezonings; circles are applications (orange = open for comment). Click one for the City's notice."
+      }
+    }
+  ],
+  "facts": [
+    "In the 12 months to {latest} the City issued {permits_12m} building permits with {value_12m} of declared construction value. That is about {per_day_12m} permits every working day.",
+    "Busiest neighbourhood by number of permits: {top_hood_count_12m} ({top_hood_count_12m_n}).",
+    "Most new homes permitted: {top_hood_homes_12m}, about {top_hood_homes_12m_n} of them.",
+    "The single biggest permit: {biggest_what_12m} at {biggest_address_12m} ({biggest_hood_12m}), declared at {biggest_value_12m}.",
+    "Half of all permits are for jobs under {median_12m}. Most building in Regina is small renovation work, not towers.",
+    "The City issues the most permits on {busiest_weekday}s ({busiest_weekday_n} in the last year).",
+    "{laneway_12m} backyard or laneway suites were permitted in the last 12 months.",
+    "Since {since} the City has issued {permits_all} building permits worth {value_all}. Use the date controls to travel through all of it.",
+    "The biggest full year for declared construction value since {first_year} was {best_year}, at {best_year_value}.",
+    "The biggest permit since {first_year}: {biggest_what_all} at {biggest_address_all}, {biggest_value_all}, issued {biggest_date_all}.",
+    "Regina grew from {pop_first} people in {pop_first_year} to {pop_last} in {pop_last_year}, up {pop_growth_pct}% (Statistics Canada).",
+    "Average rent for a purpose-built rental unit in Regina was {rent_last} in {rent_last_year}, and {vacancy_last} of units were empty (CMHC)."
+  ]
+}

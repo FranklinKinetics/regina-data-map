@@ -16,7 +16,7 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; }
+html, body { height: 100%; margin: 0; overflow: hidden; }
 body { background: var(--carbon); color: var(--draft); font: 15px/1.5 var(--font-body); }
 a { color: var(--beacon); }
 h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
@@ -37,7 +37,7 @@ html.embedded header.top { display: none; }
 .tabs button { flex: 1; background: none; border: 0; border-bottom: 3px solid transparent; padding: 11px 6px 9px; cursor: pointer; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--draft-dim); }
 .tabs button[aria-selected=true] { color: var(--draft); border-bottom-color: var(--beacon); }
 .tabs button:hover { color: var(--draft); }
-.tabpanel { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 16px 24px; display: flex; flex-direction: column; gap: 18px; }
+.tabpanel { position: relative; flex: 1; min-height: 0; overflow-y: auto; padding: 14px 16px 24px; display: flex; flex-direction: column; gap: 18px; }
 .tabpanel[hidden] { display: none; }
 :focus-visible { outline: 2px solid var(--beacon); outline-offset: 2px; }
 .sec h2 { font-size: 0.95rem; margin-bottom: 8px; }
@@ -122,7 +122,7 @@ details.more-info p, details.more-info li { font-size: 0.86rem; margin: 8px 0 0;
 details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
 .foot { font-size: 0.78rem; color: var(--draft-dim); border-top: 1px solid var(--line); padding-top: 12px; }
 /* map overlays */
-.caption { position: absolute; z-index: 1000; left: 12px; top: 12px; max-width: min(440px, calc(100% - 70px)); background: rgba(33, 31, 33, 0.94); border: 1px solid var(--beacon); padding: 10px 34px 10px 14px; }
+.caption { position: absolute; z-index: 1000; left: 56px; top: 12px; max-width: min(440px, calc(100% - 70px)); background: rgba(33, 31, 33, 0.94); border: 1px solid var(--beacon); padding: 10px 34px 10px 14px; }
 .caption[hidden] { display: none; }
 .caption b { font-family: var(--font-display); display: block; font-size: 0.98rem; line-height: 1.25; }
 .caption p { margin: 4px 0 0; font-size: 0.86rem; }
@@ -163,13 +163,59 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
 .mk-rezone { width: 16px; height: 16px; background: var(--beacon); border: 2px solid #fff; transform: rotate(45deg); }
 .mk-app { width: 18px; height: 18px; border: 3px solid #fff; border-radius: 50%; background: rgba(33, 31, 33, 0.5); }
 .mk-app.open { background: var(--beacon); }
+/* time-lapse: clock, callouts, recap, leaderboard, rings, activity strip */
+.hud { position: absolute; z-index: 1000; left: 56px; top: 12px; width: min(350px, calc(100% - 70px)); display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.hud > div { pointer-events: auto; background: rgba(33, 31, 33, 0.94); border: 1px solid var(--line); padding: 8px 12px; }
+.hud > [hidden] { display: none; }
+.clock .ck-k { font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--draft-dim); }
+.clock .ck-d { font-family: var(--font-display); font-weight: 700; font-size: 1.55rem; line-height: 1.1; }
+.clock .ck-s { font-size: 0.78rem; color: var(--draft-dim); font-variant-numeric: tabular-nums; margin-top: 3px; }
+.clock .ck-s b { color: var(--draft); font-family: var(--font-display); }
+.callout { border-color: var(--beacon) !important; animation: slidein 0.35s ease-out; }
+.callout .co-d { font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--draft-dim); }
+.callout .co-v { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; color: var(--beacon); line-height: 1.15; }
+.callout .co-t { font-size: 0.84rem; line-height: 1.35; }
+.recap { border-color: var(--beacon) !important; }
+.recap h3 { font-size: 0.98rem; margin-bottom: 6px; }
+.recap ul { margin: 0 0 8px; padding-left: 18px; font-size: 0.83rem; }
+.recap li { margin: 3px 0; }
+.recap .row { gap: 6px; }
+.recap .btn { min-height: 34px; padding: 5px 12px; }
+.race { position: absolute; z-index: 1000; right: 12px; top: 12px; width: 240px; background: rgba(33, 31, 33, 0.94); border: 1px solid var(--line); padding: 8px 12px 8px; }
+.race[hidden] { display: none; }
+.race .rc-h { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 8px; }
+.race .rc-h b { flex: 1 0 100%; padding-right: 22px; font-family: var(--font-mono); font-weight: 400; font-size: 0.64rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--draft-dim); line-height: 1.25; }
+.race .rc-h button { background: none; border: 1px solid var(--line); padding: 2px 7px; cursor: pointer; font-size: 0.7rem; color: var(--draft-dim); min-height: 22px; }
+.race .rc-h button[aria-pressed=true] { background: var(--steel); color: var(--draft); border-color: var(--beacon); }
+.race .rc-h button.x { position: absolute; right: 6px; top: 4px; border: 0; font-size: 1.15rem; padding: 0 4px; }
+.rc-b { position: relative; height: 150px; overflow: hidden; }
+.rc-r { position: absolute; left: 0; right: 0; top: 0; height: 28px; transition: transform 0.45s ease, opacity 0.4s ease; font-size: 0.76rem; }
+.rc-r .rc-n { display: block; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 56px; font-weight: 600; }
+.rc-r i { display: block; height: 6px; margin-top: 4px; background: var(--beacon); transition: width 0.4s ease; }
+.rc-r b { position: absolute; right: 0; top: 0; font-family: var(--font-display); font-variant-numeric: tabular-nums; }
+.halo { width: 44px; height: 44px; margin: -22px 0 0 -22px; border: 2px solid #fff; border-radius: 50%; animation: ring 1.1s ease-out forwards; pointer-events: none; }
+.halo.big { width: 76px; height: 76px; margin: -38px 0 0 -38px; border: 3px solid var(--beacon); animation-duration: 1.9s; }
+@keyframes ring { from { transform: scale(0.12); opacity: 1; } to { transform: scale(1); opacity: 0; } }
+@keyframes slidein { from { transform: translateY(-8px); opacity: 0; } to { transform: none; opacity: 1; } }
+.spark { height: 26px; margin: 0 8px 3px; }
+.spark svg { width: 100%; height: 100%; display: block; }
+.spark .sp0 { fill: rgba(237, 232, 224, 0.2); }
+.spark .sp1 { fill: var(--beacon); }
+.timebar .spd { background: none; border: 1px solid var(--line); padding: 1px 8px; cursor: pointer; font-family: var(--font-mono); font-size: 0.72rem; color: var(--draft-dim); min-height: 24px; }
+.timebar .spd:hover { border-color: var(--beacon); color: var(--draft); }
+@media (max-width: 1079px) { .race { display: none; } } /* not enough map width beside the clock and callouts */
+@media (max-width: 860px) {
+  .hud { left: 50px; right: 8px; top: 8px; width: auto; }
+  .clock .ck-d { font-size: 1.15rem; }
+  .spark { height: 18px; }
+}
 @media (max-width: 860px) {
   .main { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(280px, 50%) minmax(0, 1fr); }
   .panel { border-left: 0; border-top: 1px solid var(--line); }
   .timebar { bottom: 34px; left: 8px; right: 8px; padding: 5px 8px; gap: 2px 10px; }
   .timebar .play { width: 36px; height: 36px; }
   .timebar .tl { font-size: 0.72rem; }
-  .caption { left: 8px; right: 8px; top: 8px; max-width: none; padding: 7px 30px 7px 10px; }
+  .caption { left: 50px; right: 8px; top: 8px; max-width: none; padding: 7px 30px 7px 10px; }
   .caption b { font-size: 0.88rem; }
   .caption p { font-size: 0.78rem; margin-top: 2px; }
   header.top { padding: 6px 12px; }
@@ -192,15 +238,27 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
     <section class="mapcol" aria-label="Map">
       <div id="map" role="application" aria-label="Map of Regina building permits, zoning and proposed development. The Places tab lists the same permits by neighbourhood."></div>
       <div class="caption" id="caption" hidden role="status" aria-live="polite"><b id="cap-t"></b><p id="cap-p"></p><button type="button" id="cap-x" aria-label="Close">&times;</button></div>
+      <div class="hud" id="hud">
+        <div class="clock" id="clock" hidden aria-hidden="true"><div class="ck-k" id="ck-k"></div><div class="ck-d" id="ck-d"></div><div class="ck-s" id="ck-s"></div></div>
+        <div class="callout" id="callout" hidden role="status" aria-live="polite"></div>
+        <div class="recap" id="recap" hidden role="status" aria-live="polite"></div>
+      </div>
+      <aside class="race" id="race" hidden aria-label="Leaderboard of neighbourhoods while the time-lapse plays">
+        <div class="rc-h"><b id="rc-t">Leading neighbourhoods</b>
+          <button type="button" data-m="value" aria-pressed="true" title="By declared value">$</button><button type="button" data-m="homes" aria-pressed="false" title="By new homes permitted">Homes</button><button type="button" data-m="permits" aria-pressed="false" title="By number of permits">#</button>
+          <button type="button" class="x" id="rc-x" aria-label="Hide leaderboard">&times;</button></div>
+        <div class="rc-b" id="rc-b"></div>
+      </aside>
       <div class="timebar" aria-label="Date controls">
         <button type="button" class="play" id="play" aria-label="Play through time">&#9654;</button>
         <div class="tbmain">
+          <div class="spark" id="spark"></div>
           <div class="dual" id="dual">
             <div class="track"><div class="hl" id="hl"></div></div>
             <input type="range" id="slider0" min="0" max="0" value="0" aria-label="Start date">
             <input type="range" id="slider" min="0" max="0" value="0" aria-label="Snapshot date: show permits up to this day">
           </div>
-          <div class="tl"><span id="tb-range"></span><span id="tb-count"></span></div>
+          <div class="tl"><span id="tb-range"></span><span id="tb-count"></span><button type="button" class="spd" id="speed" aria-label="Playback speed: 1 times">1&times;</button></div>
         </div>
       </div>
     </section>
@@ -217,7 +275,8 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
           <div class="stories" id="stories"></div>
           <div class="row" style="margin-top:10px">
             <button type="button" class="btn primary" id="surprise">Surprise me</button>
-            <button type="button" class="btn" id="play2">Watch the last year build up</button>
+            <button type="button" class="btn" id="play2">Watch the last 12 months</button>
+            <button type="button" class="btn" id="play3">Travel through the years</button>
             <button type="button" class="btn" id="reset">Reset</button>
           </div>
         </div>
@@ -323,6 +382,16 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   document.getElementById("st-latest").textContent = "checking for newer data";
   fetchNewer(BUILT_IN).then((fresh) => boot(fresh || BUILT_IN, !!fresh));
 
+  function validContent(c) {
+    const str = (v, n) => typeof v === "string" && v.trim() && v.length <= n;
+    try {
+      return !!c && !!c.intro && str(c.intro.title, 200) && str(c.intro.body, 600) && Array.isArray(c.stories) && c.stories.length >= 1 && c.stories.length <= 12 &&
+        c.stories.every((s) => s && /^[a-z0-9-]+$/.test(s.id) && str(s.title, 120) && str(s.sub, 160) && s.caption && str(s.caption.title, 300) && str(s.caption.body, 800) &&
+          (s.show == null || (typeof s.show === "object" && (s.show.groups == null || Array.isArray(s.show.groups)) && (s.show.min == null || typeof s.show.min === "number") && (s.show.span == null || typeof s.show.span === "number")))) &&
+        Array.isArray(c.facts) && c.facts.length >= 1 && c.facts.length <= 80 && c.facts.every((f) => str(f, 600));
+    } catch (e) { return false; }
+  }
+
   // Ask the data host for a newer copy. Offline, blocked, a bad reply or an older copy all fall back to the data inside this file.
   function fetchNewer(cur) {
     if (!DATA_URL || !window.fetch) return Promise.resolve(null);
@@ -338,6 +407,7 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
 
   function boot(D, live) {
   const M = D.meta, A = M.asof;
+  const C = validContent(D.content) ? D.content : BUILT_IN.content; // words come from the data file; fall back to the copy inside this file if missing or malformed
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const money = (v) => "$" + Math.round(v).toLocaleString("en-CA");
@@ -387,7 +457,7 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   $("sources").innerHTML = [
     "City of Regina, Building Permit Report. Permits issued " + fmtDate(A.permits_start) + " to " + fmtDate(A.permits) + "; the date controls pick any stretch of that time (the map opens on the last 12 months). Updated by the City each Thursday.",
     "City of Regina Open Data: Zoning and Land Use districts (snapshot " + fmtDate(A.zoning) + "), Road Centerline, Address Points, Parcels and Community Associations (ArcGIS open data services).",
-    "City of Regina, Proposed Development notices (snapshot " + fmtDate(A.applications) + "). Rezonings are spotted by comparing the City's own zoning snapshots, so only changes since " + fmtDate("2026-07-26") + " show.",
+    "City of Regina, Proposed Development notices (snapshot " + fmtDate(A.applications) + "). Rezonings are spotted by comparing the City's own zoning snapshots, so only changes since " + fmtDate(A.rezoning_baseline || "2026-07-26") + " show.",
     "Statistics Canada: population estimates for July 1, " + A.population_year + " (Table 17-10-0155-01, released " + fmtDate(A.population) + "); components of population change to " + A.migration_year + " (Table 17-10-0149-01); 2021 Census income and shelter-cost data.",
     "Canada Mortgage and Housing Corporation (CMHC), Rental Market Survey, Regina, to " + A.rent_year + ".",
   ].map((s) => "<li>" + esc(s) + "</li>").join("");
@@ -454,7 +524,7 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   const article = (s) => (/^[aeiou]/i.test(s) ? "an " : "a ");
   const markers = D.permits.filter((p) => p.lon != null).map((p) => {
     const m = L.circleMarker([p.lat, p.lon], { renderer: canvas, radius: radius(p.v), color: "#15130f", weight: 0.6, fillColor: GROUP_COLOR[p.g], fillOpacity: 0.85, bubblingMouseEvents: false });
-    m.p = p; m._shown = false;
+    m.p = p; m._shown = false; m._st = ""; m._di = dayIdx(p.d);
     m.on("click", () => L.popup({ maxWidth: 290 }).setLatLng([p.lat, p.lon]).setContent(permitPopup(p)).openOn(map));
     return m;
   }).sort((a, c) => c.p.v - a.p.v);
@@ -520,25 +590,26 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   }
 
   // ---------------------------------------------------------------- filtering and drawing
-  function passes(p) {
+  function filt(p) { // everything except the date
     if (!state.groups.has(p.g)) return false;
     if (p.v < state.min) return false;
     if (state.hood && p.n !== state.hood) return false;
-    if (p.d < win.start || p.d > win.upTo) return false;
     if (state.q && !((p.a + " " + p.n + " " + p.t + " " + what(p)).toLowerCase().includes(state.q))) return false;
     return true;
   }
-  let current = [], lastRecent = [];
-  function refresh() {
+  const passes = (p) => filt(p) && p.d >= win.start && p.d <= win.upTo;
+  let current = [];
+  function refresh(fast) {
     setWindow();
     current = D.permits.filter(passes);
-    const showPermits = $("t-permits").checked;
-    lastRecent.forEach((m) => m.setStyle({ weight: 0.6, color: "#15130f" })); lastRecent = [];
+    const showPermits = $("t-permits").checked, born = [];
     markers.forEach((m) => {
       const should = showPermits && passes(m.p);
-      if (should && !m._shown) { permitLayer.addLayer(m); m._shown = true; if (playing) { m.setStyle({ weight: 2.2, color: "#ffffff" }); lastRecent.push(m); } }
-      else if (!should && m._shown) { permitLayer.removeLayer(m); m._shown = false; }
+      if (should && !m._shown) { permitLayer.addLayer(m); m._shown = true; if (anim) born.push(m); }
+      else if (!should && m._shown) { permitLayer.removeLayer(m); m._shown = false; if (m._st) { m._st = ""; m.setStyle(baseStyle(m)); } }
+      if (anim && m._shown) playStyle(m);
     });
+    if (anim && born.length) rings(born);
     caStats = {};
     current.forEach((p) => { if (p.ca) { const s = caStats[p.ca] || (caStats[p.ca] = { n: 0, v: 0 }); s.n++; s.v += p.v; } });
     const vals = current.map((p) => p.v), total = vals.reduce((a, c) => a + c, 0);
@@ -550,8 +621,9 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
     $("s-note").textContent = (unplotted ? unplotted + " of these permits have no exact map location and are counted but not drawn. " : "") +
       (big && total && big.v / total > 0.1 ? "The largest permit (" + big.a + ", " + short(big.v) + ") is " + Math.round(100 * big.v / total) + "% of this total." : "");
     $("tb-count").innerHTML = "<b>" + num(current.length) + "</b> permits &middot; <b>" + short(total) + "</b>";
-    syncTime();
-    restyleShade(); renderHoods(); renderSpot(); writeHash();
+    buildSpark(); syncTime();
+    if (fast) { if (state.shade !== "zoning") restyleShade(); }
+    else { restyleShade(); renderHoods(); renderSpot(); writeHash(); }
   }
   const PRESET_LIST = (() => {
     const last = +M.latest.slice(0, 4), first = +T0.slice(0, 4), list = [{ l: "Last 12 months", f: addDays(M.latest, -364), t: M.latest }];
@@ -566,6 +638,7 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
     s1.max = s0.max = NDAYS; s1.value = ei; s0.value = si;
     s0.style.zIndex = si > NDAYS * 0.6 ? 3 : 1; s1.style.zIndex = 2;
     $("hl").style.left = (100 * si / NDAYS) + "%"; $("hl").style.width = Math.max(0.5, 100 * (ei - si) / NDAYS) + "%";
+    const sr = $("sp-r"); if (sr) { sr.setAttribute("x", si); sr.setAttribute("width", Math.max(1, ei - si + 1)); }
     s1.setAttribute("aria-valuetext", fmtDate(win.upTo)); s0.setAttribute("aria-valuetext", fmtDate(win.start));
     s1.setAttribute("aria-label", range ? "End date" : "Snapshot date: show permits up to this day");
     $("tb-range").innerHTML = "Showing <b>" + fmtDate(win.start) + "</b> to <b>" + fmtDate(win.upTo) + "</b>";
@@ -637,22 +710,30 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   const hideCaption = () => { $("caption").hidden = true; };
   $("cap-x").addEventListener("click", hideCaption);
   function topBy(rs, keyFn, valFn) { const by = {}; rs.forEach((p) => { by[keyFn(p)] = (by[keyFn(p)] || 0) + valFn(p); }); const e = Object.entries(by).sort((a, b) => b[1] - a[1])[0]; return e || ["", 0]; }
-  const STORIES = [
-    { id: "homes", t: "Where are new homes going up?", s: "New houses, apartments and townhouses", groups: ["new-homes", "new-multi"],
-      cap: (c) => { const u = newUnits(c), [h, hu] = topBy(c.filter((p) => p.t !== "Backyard/Laneway Suite"), (p) => p.n, (p) => p.units);
-        return [c.length + " permits for new homes and apartment buildings", "Together they add about " + num(u) + " homes. The most: " + (h || "none") + " (" + num(hu) + "). Click a dot to see what it is."]; } },
-    { id: "big", t: "The $10 million club", s: "Only the biggest projects", groups: null, min: 10000000,
-      cap: (c) => { const tot = c.reduce((a, p) => a + p.v, 0), all = YEAR.reduce((a, p) => a + p.v, 0), b = c.slice().sort((x, y) => y.v - x.v)[0];
-        return [c.length + " projects of $10 million or more", "They add up to " + compact(tot) + ", about " + Math.round(100 * tot / all) + "% of everything permitted this year." + (b ? " The biggest: " + what(b) + " at " + b.a + ", " + compact(b.v) + "." : "")]; } },
-    { id: "suites", t: "Suites and basements", s: "A quiet way Regina adds housing", groups: ["suites"],
-      cap: (c) => { const [h, hn] = topBy(c, (p) => p.n, () => 1); return [c.length + " permits for secondary suites and basement developments", "Not new buildings, but new places to live in existing ones. Most in " + (h || "none") + " (" + hn + ")."]; } },
-    { id: "month", t: "What's new this month", s: "The last 30 days of permits", groups: null, span: 30,
-      cap: (c) => { const tot = c.reduce((a, p) => a + p.v, 0), b = c.slice().sort((x, y) => y.v - x.v)[0]; return [num(c.length) + " permits in the last 30 days", compact(tot) + " of declared construction value." + (b ? " The biggest: " + what(b) + " at " + b.a + ", " + compact(b.v) + "." : "")]; } },
-    { id: "commercial", t: "Shops, offices and factories", s: "New commercial buildings and renovations", groups: ["new-commercial", "commercial-reno"],
-      cap: (c) => { const tot = c.reduce((a, p) => a + p.v, 0), [h] = topBy(c, (p) => p.n, (p) => p.v); return [num(c.length) + " commercial, industrial and institutional permits", compact(tot) + " declared. The most value: " + (h || "none") + "."]; } },
-    { id: "rezone", t: "Rezoned and proposed", s: "Zoning changes and open City applications", groups: null, events: true,
-      cap: () => { const open = D.applications.filter((a) => a.open).length; return [D.rezonings.length + " rezonings spotted, " + D.applications.length + " applications listed", open + " open for public comment right now. Diamonds are rezonings; circles are applications (orange = open for comment). Click one for the City's notice."]; } },
-  ];
+  /* tokens:story count value value_short homes median share_of_year top_hood_count top_hood_count_n top_hood_value top_hood_value_amount top_hood_homes top_hood_homes_n biggest_what biggest_address biggest_hood biggest_value biggest_date rezonings applications open_applications latest first_year */
+  const homesOf = (p) => ((p.g === "new-homes" || p.g === "new-multi") && p.t !== "Backyard/Laneway Suite" ? p.units : 0);
+  function storyTokens(c) {
+    const total = c.reduce((a, p) => a + p.v, 0), yearTotal = YEAR.reduce((a, p) => a + p.v, 0), b = c.slice().sort((x, y) => y.v - x.v)[0];
+    const hc = topBy(c, (p) => p.n, () => 1), hv = topBy(c, (p) => p.n, (p) => p.v), hh = topBy(c, (p) => p.n, homesOf);
+    return {
+      count: num(c.length), value: compact(total), value_short: short(total), homes: num(newUnits(c)), median: c.length ? money(median(c.map((p) => p.v))) : "",
+      share_of_year: yearTotal ? String(Math.round(100 * total / yearTotal)) : "",
+      top_hood_count: hc[0] || "none", top_hood_count_n: num(hc[1]), top_hood_value: hv[0] || "none", top_hood_value_amount: short(hv[1]),
+      top_hood_homes: hh[0] && hh[1] ? hh[0] : "none", top_hood_homes_n: num(hh[1]),
+      biggest_what: b ? what(b) : "", biggest_address: b ? b.a : "", biggest_hood: b ? b.n : "", biggest_value: b ? compact(b.v) : "", biggest_date: b ? fmtDate(b.d) : "",
+      rezonings: String(D.rezonings.length), applications: String(D.applications.length), open_applications: String(D.applications.filter((a) => a.open).length),
+      latest: fmtDate(M.latest), first_year: T0.slice(0, 4),
+    };
+  }
+  // "{name}" is replaced by a live number; "[[ ... ]]" is only kept when every {name} inside it has a value. ok=false means a required number was missing.
+  function fill(tpl, tok) {
+    let ok = true;
+    const has = (seg) => (seg.match(/\{[^{}]*\}/g) || []).every((m) => { const v = tok[m.slice(1, -1)]; return v != null && v !== ""; });
+    const sub = (t) => t.replace(/\{([^{}]*)\}/g, (m, k) => { const v = tok[k]; if (v == null || v === "") { ok = false; return "–"; } return v; });
+    const out = String(tpl).replace(/\[\[([\s\S]*?)\]\]/g, (m, seg) => (has(seg) ? sub(seg) : ""));
+    return { text: sub(out), ok };
+  }
+  const STORIES = C.stories.map((s) => { const sh = s.show || {}; return { id: s.id, t: s.title, s: s.sub, groups: sh.groups || null, min: sh.min || 0, span: sh.span || 0, events: !!sh.events, cap: (c) => { const tk = storyTokens(c); return [fill(s.caption.title, tk).text, fill(s.caption.body, tk).text]; } }; });
   $("stories").innerHTML = STORIES.map((s, i) => '<button type="button" class="story" data-story="' + s.id + '" aria-pressed="false"><span class="n">0' + (i + 1) + '</span><span><b>' + esc(s.t) + '</b><span class="s">' + esc(s.s) + "</span></span></button>").join("");
   function storyButtons() { document.querySelectorAll(".story").forEach((b) => b.setAttribute("aria-pressed", b.dataset.story === state.story ? "true" : "false")); }
   function setGroups(list) { state.groups = new Set(list || M.groups.map((g) => g.key)); document.querySelectorAll("#chips input").forEach((i) => { i.checked = state.groups.has(i.value); }); }
@@ -684,53 +765,222 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   });
   document.addEventListener("click", (e) => {
     const s = e.target.closest("[data-spot]"); if (s) { spotlight(s.dataset.spot); return; }
-    const f = e.target.closest("[data-find]"); if (f) { const p = D.permits.find((x) => x.id === f.dataset.find); if (p && p.lon != null) { map.setView([p.lat, p.lon], 17, { animate: !reduced }); L.popup({ maxWidth: 290 }).setLatLng([p.lat, p.lon]).setContent(permitPopup(p)).openOn(map); } }
+    const f = e.target.closest("[data-find]"); if (f) { if (playing) pausePlay(); const p = D.permits.find((x) => x.id === f.dataset.find); if (p && p.lon != null) { map.setView([p.lat, p.lon], 17, { animate: !reduced }); L.popup({ maxWidth: 290 }).setLatLng([p.lat, p.lon]).setContent(permitPopup(p)).openOn(map); } }
   });
 
-  function buildFacts() {
-    const all = YEAR, total = all.reduce((a, p) => a + p.v, 0), fs = [];
-    fs.push("In the 12 months to " + fmtDate(M.latest) + " the City issued " + num(all.length) + " building permits with " + compact(total) + " of declared construction value. That is about " + Math.round(all.length / 250) + " permits every working day.");
-    const [h1, n1] = topBy(all, (p) => p.n, () => 1); fs.push("Busiest neighbourhood by number of permits: " + h1 + " (" + num(n1) + ").");
-    const [h2, u2] = topBy(all.filter((p) => p.t !== "Backyard/Laneway Suite"), (p) => p.n, (p) => (p.g === "new-homes" || p.g === "new-multi" ? p.units : 0)); fs.push("Most new homes permitted: " + h2 + ", about " + num(u2) + " of them.");
-    const big = all.slice().sort((a, b) => b.v - a.v)[0]; fs.push("The single biggest permit: " + what(big) + " at " + big.a + " (" + big.n + "), declared at " + compact(big.v) + ".");
-    fs.push("Half of all permits are for jobs under " + money(median(all.map((p) => p.v))) + ". Most building in Regina is small renovation work, not towers.");
-    const wd = {}; all.forEach((p) => { const k = new Date(p.d + "T12:00:00").toLocaleDateString("en-CA", { weekday: "long" }); wd[k] = (wd[k] || 0) + 1; }); const bw = Object.entries(wd).sort((a, b) => b[1] - a[1])[0];
-    fs.push("The City issues the most permits on " + bw[0] + "s (" + num(bw[1]) + " in the last year).");
-    const lan = all.filter((p) => p.t === "Backyard/Laneway Suite").length; fs.push(num(lan) + " backyard or laneway suites were permitted in the last 12 months.");
-    const A_ = D.permits, yr = {}; A_.forEach((p) => { const y = p.d.slice(0, 4); yr[y] = (yr[y] || 0) + p.v; });
-    fs.push("Since " + fmtDate(T0) + " the City has issued " + num(A_.length) + " building permits worth " + compact(A_.reduce((a, p) => a + p.v, 0)) + ". Use the date controls to travel through all of it.");
+  /* tokens:fact latest first_year since permits_12m value_12m homes_12m per_day_12m top_hood_count_12m top_hood_count_12m_n top_hood_homes_12m top_hood_homes_12m_n biggest_what_12m biggest_address_12m biggest_hood_12m biggest_value_12m median_12m busiest_weekday busiest_weekday_n laneway_12m permits_all value_all best_year best_year_value biggest_what_all biggest_address_all biggest_value_all biggest_date_all pop_first pop_first_year pop_last pop_last_year pop_growth_pct rent_last rent_last_year rent_first rent_first_year vacancy_last rezonings applications open_applications */
+  function factTokens() {
+    const all = YEAR, A_ = D.permits, total = all.reduce((a, p) => a + p.v, 0);
+    const [h1, n1] = topBy(all, (p) => p.n, () => 1), [h2, u2] = topBy(all, (p) => p.n, homesOf), big = all.slice().sort((a, b) => b.v - a.v)[0], bigAll = A_.slice().sort((a, b) => b.v - a.v)[0];
+    const wd = {}; all.forEach((p) => { const k = new Date(p.d + "T12:00:00").toLocaleDateString("en-CA", { weekday: "long" }); wd[k] = (wd[k] || 0) + 1; }); const bw = Object.entries(wd).sort((a, b) => b[1] - a[1])[0] || ["", 0];
+    const yr = {}; A_.forEach((p) => { const y = p.d.slice(0, 4); yr[y] = (yr[y] || 0) + p.v; });
     const full = Object.entries(yr).filter(([y]) => +y < +M.latest.slice(0, 4)).sort((a, b) => b[1] - a[1])[0];
-    if (full) fs.push("The biggest full year for declared construction value since " + T0.slice(0, 4) + " was " + full[0] + ", at " + compact(full[1]) + ".");
-    const bigAll = A_.slice().sort((a, b) => b.v - a.v)[0]; fs.push("The biggest permit since " + T0.slice(0, 4) + ": " + what(bigAll) + " at " + bigAll.a + ", " + compact(bigAll.v) + ", issued " + fmtDate(bigAll.d) + ".");
-    const pops = D.series.population, pf = pops[0], pl = pops[pops.length - 1]; fs.push("Regina grew from " + num(pf.v) + " people in " + pf.y + " to " + num(pl.v) + " in " + pl.y + ", up " + Math.round(100 * (pl.v / pf.v - 1)) + "% (Statistics Canada).");
-    return fs;
+    const pops = D.series.population, pf = pops[0], pl = pops[pops.length - 1], rents = D.series.rent, rf = rents[0], rl = rents[rents.length - 1];
+    return {
+      latest: fmtDate(M.latest), first_year: T0.slice(0, 4), since: fmtDate(T0),
+      permits_12m: num(all.length), value_12m: compact(total), homes_12m: num(newUnits(all)), per_day_12m: String(Math.round(all.length / 250)),
+      top_hood_count_12m: h1, top_hood_count_12m_n: num(n1), top_hood_homes_12m: u2 ? h2 : "", top_hood_homes_12m_n: num(u2),
+      biggest_what_12m: big ? what(big) : "", biggest_address_12m: big ? big.a : "", biggest_hood_12m: big ? big.n : "", biggest_value_12m: big ? compact(big.v) : "",
+      median_12m: all.length ? money(median(all.map((p) => p.v))) : "", busiest_weekday: bw[0], busiest_weekday_n: num(bw[1]), laneway_12m: num(all.filter((p) => p.t === "Backyard/Laneway Suite").length),
+      permits_all: num(A_.length), value_all: compact(A_.reduce((a, p) => a + p.v, 0)), best_year: full ? full[0] : "", best_year_value: full ? compact(full[1]) : "",
+      biggest_what_all: bigAll ? what(bigAll) : "", biggest_address_all: bigAll ? bigAll.a : "", biggest_value_all: bigAll ? compact(bigAll.v) : "", biggest_date_all: bigAll ? fmtDate(bigAll.d) : "",
+      pop_first: pf ? num(pf.v) : "", pop_first_year: pf ? String(pf.y) : "", pop_last: pl ? num(pl.v) : "", pop_last_year: pl ? String(pl.y) : "", pop_growth_pct: pf && pl ? String(Math.round(100 * (pl.v / pf.v - 1))) : "",
+      rent_last: rl ? money(rl.rent) : "", rent_last_year: rl ? String(rl.y) : "", rent_first: rf ? money(rf.rent) : "", rent_first_year: rf ? String(rf.y) : "", vacancy_last: rl ? rl.vac.toFixed(1) + "%" : "",
+      rezonings: String(D.rezonings.length), applications: String(D.applications.length), open_applications: String(D.applications.filter((a) => a.open).length),
+    };
   }
+  function buildFacts() { const tk = factTokens(), out = C.facts.map((f) => fill(f, tk)).filter((r) => r.ok).map((r) => r.text); return out.length ? out : ["Every dot is a building permit the City issued."]; }
   const FACTS = buildFacts();
   const showFact = () => { $("fact").textContent = FACTS[state.fact % FACTS.length]; };
   $("fact-next").addEventListener("click", () => { state.fact = (state.fact + 1) % FACTS.length; showFact(); });
   state.fact = Math.floor(Math.random() * FACTS.length); showFact();
 
-  // ---------------------------------------------------------------- time-lapse
-  let timer = null, playing = false;
-  function stop() { playing = false; clearInterval(timer); timer = null; $("play").innerHTML = "&#9654;"; $("play").setAttribute("aria-label", "Play through time"); }
-  function play() {
-    if (playing) { stop(); return; }
-    playing = true; $("play").innerHTML = "&#10073;&#10073;"; $("play").setAttribute("aria-label", "Pause");
-    if (state.mode === "snap") {
-      if (state.snap >= M.latest) state.snap = addDays(T0, state.span ? state.span - 1 : 0);
-      const step = Math.max(1, Math.ceil(NDAYS / 160));
-      refresh();
-      timer = setInterval(() => { state.snap = state.snap >= addDays(M.latest, -step) ? M.latest : addDays(state.snap, step); refresh(); if (state.snap >= M.latest) stop(); }, 110);
-    } else {
-      const final = state.to, step = Math.max(1, Math.round((dayIdx(final) - dayIdx(state.from)) / 70));
-      state.to = state.from; refresh();
-      timer = setInterval(() => { state.to = state.to >= addDays(final, -step) ? final : addDays(state.to, step); refresh(); if (state.to >= final) stop(); }, 110);
-    }
+  // ---------------------------------------------------------------- activity strip (permits per month, behind the slider)
+  let sparkKey = null;
+  function buildSpark() {
+    const key = Array.from(state.groups).sort().join() + "|" + state.min + "|" + state.hood + "|" + state.q;
+    if (key === sparkKey) return; sparkKey = key;
+    const by = {}, H = 26;
+    D.permits.forEach((p) => { if (filt(p)) { const k = p.d.slice(0, 7); by[k] = (by[k] || 0) + 1; } });
+    const max = Math.max(1, ...Object.values(by)); let bars = "";
+    Object.keys(by).forEach((k) => {
+      const first = k + "-01", sIdx = dayIdx(first), eIdx = dayIdx(addDays(first, new Date(Date.UTC(+k.slice(0, 4), +k.slice(5, 7), 0)).getUTCDate())), w = Math.max(1, eIdx - sIdx), h = Math.max(1, H * by[k] / max);
+      bars += '<rect x="' + (sIdx + w * 0.12).toFixed(1) + '" y="' + (H - h).toFixed(1) + '" width="' + (w * 0.76).toFixed(1) + '" height="' + h.toFixed(1) + '"/>';
+    });
+    $("spark").innerHTML = '<svg viewBox="0 0 ' + NDAYS + " " + H + '" preserveAspectRatio="none" role="img" aria-label="Permits issued each month. The bright part is the stretch of time showing."><defs><clipPath id="sp-clip" clipPathUnits="userSpaceOnUse"><rect id="sp-r" x="0" y="0" width="' + NDAYS + '" height="' + H + '"/></clipPath></defs><g class="sp0">' + bars + '</g><g class="sp1" clip-path="url(#sp-clip)">' + bars + "</g></svg>";
   }
+
+  // ---------------------------------------------------------------- time-lapse
+  // Two ways to play. "build" starts at the first day of the dates you picked and adds permits until the last day (what you are looking at, built up).
+  // "roll" moves a 12-month window from the first year to now, so dots fade out as they age and you see where activity moves.
+  // Small renovation permits are drawn as faint dust so the new homes and bigger projects stand out; new permits flash, large ones send out a ring,
+  // a leaderboard keeps score, notable permits get a callout, and a recap at the end says what the period added up to.
+  const isMajor = (p) => p.v >= 1000000 || p.g === "new-homes" || p.g === "new-multi" || p.g === "new-commercial";
+  const baseStyle = (m) => ({ radius: radius(m.p.v), color: "#15130f", weight: 0.6, opacity: 1, fillOpacity: 0.85 });
+  const SPEEDS = [1, 2, 4, 0.5]; let speedI = 0;
+  let playing = false, anim = null, raf = 0, raceHidden = false, raceMetric = "value";
+  const haloLayer = L.layerGroup().addTo(map);
+  const pace = (days) => Math.max(1, days) / Math.max(8, 8 + 1.1 * Math.sqrt(days)); // days per second: about 30 s for a year, a minute for six years
+  const setPlayButton = () => { $("play").innerHTML = playing ? "&#10073;&#10073;" : "&#9654;"; $("play").setAttribute("aria-label", playing ? "Pause" : anim && anim.done ? "Replay" : "Play through time"); };
+  const monthLabel = (iso) => new Date(iso + "T12:00:00").toLocaleDateString("en-CA", { month: "long", year: "numeric" });
+
+  function playStyle(m) {
+    const p = m.p, age = anim.lastDay - m._di, calm = anim.calm && !isMajor(p);
+    let key, st;
+    if (age <= 10) {
+      const k = Math.max(0, age); key = "n" + k + (calm ? "c" : "");
+      st = calm ? { radius: 2.2 + 3.2 * (1 - k / 10), weight: 1, color: "#fff", opacity: 0.9, fillOpacity: 1 } : { radius: radius(p.v) * (1 + 0.8 * (1 - k / 10)), weight: 2, color: "#fff", opacity: 1, fillOpacity: 1 };
+    } else {
+      const f = anim.kind === "roll" ? Math.min(5, Math.max(0, Math.round(((age / anim.span) - 0.7) / 0.3 * 5))) : 0;
+      key = "s" + f + (calm ? "c" : "");
+      st = calm ? { radius: 2, weight: 0, opacity: 0, fillOpacity: 0.3 * (1 - f / 6) } : { radius: radius(p.v), weight: 0.6, color: "#15130f", opacity: 1 - f / 6, fillOpacity: 0.85 * (1 - f / 6.5) };
+    }
+    if (m._st !== key) { m._st = key; m.setStyle(st); }
+  }
+  function restoreStyles() { markers.forEach((m) => { if (m._st) { m._st = ""; m.setStyle(baseStyle(m)); } }); }
+  const ringIcon = (cls) => L.divIcon({ className: "", html: '<div class="halo' + cls + '"></div>', iconSize: [0, 0] });
+  function ring(p, big) {
+    if (reduced) return;
+    const m = L.marker([p.lat, p.lon], { icon: ringIcon(big ? " big" : ""), interactive: false, keyboard: false }).addTo(haloLayer);
+    setTimeout(() => haloLayer.removeLayer(m), big ? 2000 : 1200);
+  }
+  function rings(born) { let n = 0; born.forEach((m) => { if (n < 10 && anim.lastDay - m._di <= 3 && (m.p.v >= 1000000 || (m.p.g === "new-multi" && m.p.units >= 12))) { ring(m.p, false); n++; } }); }
+
+  // callouts for the notable permits, one at a time
+  let callQ = [], callTimer = 0, callOn = false;
+  function showCall(p) {
+    const w = what(p);
+    $("callout").innerHTML = '<div class="co-d">' + esc(fmtDate(p.d)) + '</div><div class="co-v">' + esc(compact(p.v)) + '</div><div class="co-t">' + esc(cap1(article(w)) + w) + " at <b>" + esc(p.a) + "</b>, " + esc(p.n) +
+      '. <button type="button" class="pp-b" data-find="' + esc(p.id) + '" style="margin:0">Zoom there</button></div>';
+    $("callout").hidden = false; ring(p, true);
+  }
+  function pump() {
+    if (callOn || !callQ.length || !anim) return;
+    const p = callQ.shift(); callOn = true; showCall(p);
+    callTimer = setTimeout(() => { callOn = false; $("callout").hidden = true; pump(); }, Math.max(1500, 3600 / SPEEDS[speedI]));
+  }
+  function fireCalls(day) {
+    while (anim.next < anim.calls.length && dayIdx(anim.calls[anim.next].d) <= day) { callQ.push(anim.calls[anim.next++]); if (callQ.length > 3) callQ.shift(); }
+    pump();
+  }
+
+  // leaderboard of neighbourhoods
+  const raceRows = new Map(), RACE_FMT = { value: short, homes: num, permits: num }, RACE_KEY = { value: "v", homes: "h", permits: "n" };
+  const RACE_TITLE = { value: "Most building by declared value", homes: "Most new homes permitted", permits: "Most permits issued" };
+  function raceClear() { raceRows.forEach((el) => el.remove()); raceRows.clear(); }
+  function renderRace() {
+    if (raceHidden) return;
+    const by = {}; current.forEach((p) => { const r = by[p.n] || (by[p.n] = { v: 0, h: 0, n: 0 }); r.v += p.v; r.h += homesOf(p); r.n++; });
+    const key = RACE_KEY[raceMetric], top = Object.entries(by).map(([n, r]) => [n, r[key]]).filter((e) => e[1] > 0).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 5), max = top.length ? top[0][1] : 1, seen = new Set();
+    $("rc-t").textContent = RACE_TITLE[raceMetric] + (anim && anim.kind === "roll" ? ", last 12 months" : " so far");
+    top.forEach(([n, val], i) => {
+      let el = raceRows.get(n);
+      if (!el) {
+        el = document.createElement("div"); el.className = "rc-r"; el.innerHTML = '<span class="rc-n"></span><i></i><b></b>'; el.firstChild.textContent = n;
+        el.style.opacity = "0"; el.style.transform = "translateY(" + (i * 30 + 36) + "px)"; $("rc-b").appendChild(el); raceRows.set(n, el); void el.offsetWidth;
+      }
+      el.children[1].style.width = Math.max(2, 100 * val / max) + "%"; el.children[2].textContent = RACE_FMT[raceMetric](val);
+      el.style.opacity = "1"; el.style.transform = "translateY(" + i * 30 + "px)"; seen.add(n);
+    });
+    raceRows.forEach((el, n) => { if (!seen.has(n)) { el.style.opacity = "0"; el.style.transform = "translateY(190px)"; raceRows.delete(n); setTimeout(() => el.remove(), 450); } });
+  }
+  $("race").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.id === "rc-x") { raceHidden = true; $("race").hidden = true; return; }
+    if (b.dataset.m) { raceMetric = b.dataset.m; document.querySelectorAll("#race [data-m]").forEach((x) => x.setAttribute("aria-pressed", x === b ? "true" : "false")); raceClear(); renderRace(); }
+  });
+
+  function clockUpdate(d) {
+    const total = current.reduce((a, p) => a + p.v, 0);
+    $("ck-k").textContent = anim.kind === "roll" ? "Rolling " + (anim.span >= 360 ? "12-month" : anim.span + "-day") + " window" : "Building up";
+    $("ck-d").textContent = monthLabel(d);
+    $("ck-s").innerHTML = "<b>" + num(current.length) + "</b> permits &middot; <b>" + short(total) + "</b> &middot; <b>" + num(newUnits(current)) + "</b> new homes";
+  }
+
+  function step(day) {
+    const d = addDays(T0, day);
+    if (anim.kind === "roll") state.snap = d; else state.to = d;
+    anim.lastDay = day; refresh(true); anim.lastRefresh = performance.now();
+    clockUpdate(d); renderRace(); fireCalls(day);
+  }
+  function frame(now) {
+    if (!playing || !anim) return;
+    const dt = Math.min(0.1, (now - anim.last) / 1000); anim.last = now;
+    anim.cur = Math.min(anim.i1, anim.cur + dt * anim.rate * SPEEDS[speedI]);
+    const day = Math.floor(anim.cur);
+    if (day !== anim.lastDay && now - anim.lastRefresh > 66) step(day);
+    if (anim.cur >= anim.i1) { if (anim.lastDay !== anim.i1) step(anim.i1); finishPlay(); return; }
+    raf = requestAnimationFrame(frame);
+  }
+  function pausePlay() { playing = false; cancelAnimationFrame(raf); setPlayButton(); }
+  function resumePlay() { playing = true; anim.last = performance.now(); setPlayButton(); raf = requestAnimationFrame(frame); }
+  // leave the time-lapse and go back to the normal map (the caller redraws)
+  function stop() {
+    if (!anim && !playing) return;
+    pausePlay(); clearTimeout(callTimer); callQ = []; callOn = false;
+    anim = null; restoreStyles(); haloLayer.clearLayers(); raceClear();
+    ["clock", "callout", "recap", "race"].forEach((id) => { $(id).hidden = true; });
+    setPlayButton();
+  }
+
+  function startPlay(kind) {
+    stop();
+    let from, to, span = 0;
+    if (kind === "roll") { span = state.mode === "snap" && state.span ? state.span : 365; from = addDays(T0, span - 1); to = M.latest; }
+    else { setWindow(); from = win.start; to = win.upTo; }
+    if (dayIdx(to) - dayIdx(from) < 2) { from = addDays(M.latest, -364); to = M.latest; kind = "build"; }
+    hideCaption(); state.story = ""; storyButtons();
+    if (kind === "roll") { state.mode = "snap"; state.span = span; state.snap = from; } else { state.mode = "range"; state.from = from; state.to = from; }
+    const pool = D.permits.filter((p) => filt(p) && p.d >= from && p.d <= to), minor = pool.filter((p) => !isMajor(p)).length;
+    const calls = pool.filter((p) => p.v >= 1500000 && p.lon != null).sort((x, y) => y.v - x.v).slice(0, 10).sort((x, y) => (x.d < y.d ? -1 : 1));
+    const i0 = dayIdx(from), i1 = dayIdx(to);
+    anim = { kind, from, to, span, i0, i1, cur: i0, rate: pace(i1 - i0), last: performance.now(), lastDay: -1, lastRefresh: 0, calm: minor > 0.4 * pool.length && minor < pool.length, calls, next: 0, done: false };
+    playing = true; setPlayButton();
+    $("clock").hidden = false; $("recap").hidden = true; $("callout").hidden = true; $("race").hidden = raceHidden;
+    step(i0);
+    raf = requestAnimationFrame(frame);
+  }
+
+  function finishPlay() {
+    playing = false; anim.done = true; setPlayButton();
+    refresh(); buildRecap();
+    $("clock").hidden = true; $("recap").hidden = false;
+  }
+  function buildRecap() {
+    const set = anim.kind === "roll" ? D.permits.filter(filt) : current, total = set.reduce((a, p) => a + p.v, 0), li = [];
+    const months = {}; set.forEach((p) => { const k = p.d.slice(0, 7); months[k] = (months[k] || 0) + 1; });
+    const bm = Object.entries(months).sort((a, b) => b[1] - a[1])[0], hoods = {}; set.forEach((p) => { hoods[p.n] = (hoods[p.n] || 0) + p.v; });
+    const top3 = Object.entries(hoods).sort((a, b) => b[1] - a[1]).slice(0, 3), big = set.slice().sort((a, b) => b.v - a.v)[0];
+    li.push("<b>" + num(set.length) + "</b> permits worth <b>" + short(total) + "</b> declared, including <b>" + num(newUnits(set)) + "</b> new homes.");
+    if (bm) li.push("Busiest month: <b>" + esc(monthLabel(bm[0] + "-15")) + "</b> (" + num(bm[1]) + " permits).");
+    if (top3.length) li.push("Most building by value: " + top3.map(([n, v]) => "<b>" + esc(n) + "</b> (" + short(v) + ")").join(", ") + ".");
+    if (big) li.push("Biggest project: " + esc(what(big)) + " at <b>" + esc(big.a) + "</b>, " + short(big.v) + ".");
+    if (anim.kind === "build") {
+      const len = dayIdx(anim.to) - dayIdx(anim.from) + 1, pFrom = addDays(anim.from, -len), pTo = addDays(anim.from, -1);
+      if (pFrom >= T0 && len >= 14) {
+        const prev = D.permits.filter((p) => filt(p) && p.d >= pFrom && p.d <= pTo), pv = prev.reduce((a, p) => a + p.v, 0), pct = (a, b) => (b ? (a >= b ? "+" : "") + Math.round(100 * (a / b - 1)) + "%" : "n/a");
+        if (prev.length) li.push("Against the " + len + " days before: permits <b>" + pct(set.length, prev.length) + "</b>, declared value <b>" + pct(total, pv) + "</b>.");
+      }
+    }
+    $("recap").innerHTML = "<h3>" + esc(anim.kind === "roll" ? "Everything since " + fmtDate(T0) : fmtDate(anim.from) + " to " + fmtDate(anim.to)) + ", in short</h3><ul>" + li.map((x) => "<li>" + x + "</li>").join("") +
+      '</ul><div class="row"><button type="button" class="btn primary" id="rp-again">Replay</button><button type="button" class="btn" id="rp-x">Close</button></div>';
+  }
+  $("recap").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.id === "rp-again") startPlay(anim ? anim.kind : "build"); else if (b.id === "rp-x") { stop(); refresh(); }
+  });
+  function play() {
+    if (playing) { pausePlay(); return; }
+    if (anim && !anim.done) { resumePlay(); return; }
+    startPlay(anim && anim.done ? anim.kind : "build");
+  }
+  $("speed").addEventListener("click", () => { speedI = (speedI + 1) % SPEEDS.length; $("speed").innerHTML = SPEEDS[speedI] + "&times;"; $("speed").setAttribute("aria-label", "Playback speed: " + SPEEDS[speedI] + " times"); });
+
   const touched = () => { state.story = ""; storyButtons(); };
   const setRange = (f, t) => { stop(); state.mode = "range"; state.from = clampDay(f); state.to = clampDay(t); touched(); refresh(); };
   $("play").addEventListener("click", play);
-  $("play2").addEventListener("click", () => { stop(); setRange(addDays(M.latest, -364), M.latest); play(); });
+  $("play2").addEventListener("click", () => { setRange(addDays(M.latest, -364), M.latest); startPlay("build"); });
+  $("play3").addEventListener("click", () => { touched(); startPlay("roll"); });
   $("slider").addEventListener("input", (e) => {
     stop(); const d = addDays(T0, +e.target.value); touched();
     if (state.mode === "snap") state.snap = d; else state.to = d < state.from ? state.from : d;
@@ -858,7 +1108,7 @@ details.more-info ul { padding-left: 18px; margin: 4px 0 0; }
   }
   const restored = readHash();
   syncRoadNames(); refresh();
-  if (!restored) { caption("Click anything", "Every dot is a building permit the City issued. Pick a story, slide through time since " + T0.slice(0, 4) + ", or hit Surprise me."); introTimer = setTimeout(hideCaption, 12000); }
+  if (!restored) { const tk = storyTokens(YEAR); caption(fill(C.intro.title, tk).text, fill(C.intro.body, tk).text); introTimer = setTimeout(hideCaption, 12000); }
   window.addEventListener("resize", () => map.invalidateSize());
   const settle = () => { map.invalidateSize(); if (!restored && !state.hood && !state.story) fitCity(); };
   requestAnimationFrame(settle); setTimeout(settle, 350);

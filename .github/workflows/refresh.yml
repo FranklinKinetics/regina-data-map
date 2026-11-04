@@ -1,11 +1,18 @@
 name: Refresh Regina Data Map
 
-# Every Friday morning (the City updates its permit list on Thursdays), and on demand from the Actions tab.
+# Every Friday morning (the City updates its permit list on Thursdays), on demand from the Actions tab,
+# and whenever the words on the map (config/lab-content.json) or the map's code change.
 # 13:30 UTC is 7:30 am in Regina, which does not change its clocks.
 on:
   schedule:
     - cron: "30 13 * * 5"
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - config/lab-content.json
+      - templates/**
+      - scripts/build_lab_map.py
 
 permissions:
   contents: write
@@ -35,6 +42,7 @@ jobs:
       - name: Download and check the data
         run: python -m scraper.run
 
+      # Also checks config/lab-content.json: a typo in the words stops the build here with a message.
       - name: Build the map
         env:
           LAB_OUT_DIR: lab-02
@@ -49,6 +57,7 @@ jobs:
           assert d["meta"]["schema"] == 1, "unexpected data format"
           assert len(d["permits"]) > 10000, "too few permits: " + str(len(d["permits"]))
           assert len(d["zoning"]["features"]) > 10, "zoning missing"
+          assert d["content"]["stories"] and d["content"]["facts"], "map words missing"
           print("ok:", len(d["permits"]), "permits through", d["meta"]["latest"])
           PY
 
@@ -60,7 +69,7 @@ jobs:
           git config user.name "regina-data-map bot"
           git config user.email "actions@users.noreply.github.com"
           git add data
-          if git diff --cached --quiet; then echo "no changes to save"; else git commit -m "Weekly refresh $(date -u +%F)" && git push; fi
+          if git diff --cached --quiet; then echo "no changes to save"; else git commit -m "Weekly refresh $(date -u +%F)" && git pull --rebase && git push; fi
 
       - name: Stage the site
         run: |
