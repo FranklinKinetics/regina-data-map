@@ -16,13 +16,13 @@ No company, applicant or owner names are published here. Names in the City's per
 
 ## Live map, and make it your own
 
-* **Browse it:** https://franklinkinetics.github.io/regina-data-map/ (no download, works on a phone).
+* **Browse it:** https://regina-build-map.franklinkinetics.com/ (no download, works on a phone).
 * **Save a copy:** the live map has a **Save a copy of this map** button (Explore tab, "Take it with you"). The saved file is the whole map in one page: open it in a browser, edit it in a text editor or with an AI assistant, host it anywhere. It keeps checking this site for newer data when it is online.
 * **Fork it:** click **Fork** on GitHub to get your own copy of the whole pipeline (weekly data refresh, map build, your own live page). The code is MIT-licensed ([`LICENSE`](LICENSE)); the data keeps its own licences, so keep the attribution the map shows.
 
 ## Use the data yourself
 
-* **Download files** (no sign-up, no code): `https://franklinkinetics.github.io/regina-data-map/data/` has `permits.csv`, `permits.geojson`, `rezonings.json`, `applications.json`, `context.json`, `tax-rates.csv` (City property tax rates by year since 2019) and a `data-dictionary.json`. Rebuilt every Friday.
+* **Download files** (no sign-up, no code): `https://regina-build-map.franklinkinetics.com/data/` has `permits.csv`, `permits.geojson`, `rezonings.json`, `applications.json`, `context.json`, `tax-rates.csv` (City property tax rates by year since 2019) and a `data-dictionary.json`. Rebuilt every Friday.
 * **Change the words on the map** (stories, facts, opening message) without a new download: see [`CONTENT-GUIDE.md`](CONTENT-GUIDE.md).
 * **Property tax rates** come from the City's yearly Property Tax Bylaw, typed into `config/tax-rates.json`. Add the new year each spring (instructions at the end of the guide above).
 
