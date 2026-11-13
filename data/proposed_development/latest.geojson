@@ -8,6 +8,105 @@
         "coordinates": [
           [
             [
+              -104.60808755171018,
+              50.44588695202727
+            ],
+            [
+              -104.60808754828219,
+              50.445955481723686
+            ],
+            [
+              -104.60808754481408,
+              50.44602392173427
+            ],
+            [
+              -104.60808754212566,
+              50.44609236174667
+            ],
+            [
+              -104.60808753869185,
+              50.446160891938916
+            ],
+            [
+              -104.60808739477757,
+              50.446229330975854
+            ],
+            [
+              -104.60808739208727,
+              50.44629777098583
+            ],
+            [
+              -104.60808739017665,
+              50.44636621099762
+            ],
+            [
+              -104.60808724473473,
+              50.44643474021013
+            ],
+            [
+              -104.60862386351961,
+              50.446434572078104
+            ],
+            [
+              -104.6086240066665,
+              50.44636613254291
+            ],
+            [
+              -104.6086240093231,
+              50.446297602849576
+            ],
+            [
+              -104.60862401123941,
+              50.446229162837774
+            ],
+            [
+              -104.6086241543838,
+              50.44616072330019
+            ],
+            [
+              -104.6086241570385,
+              50.446092193604386
+            ],
+            [
+              -104.60862415895294,
+              50.446023753590175
+            ],
+            [
+              -104.60862416238676,
+              50.445955223895425
+            ],
+            [
+              -104.60862430474762,
+              50.44588678435193
+            ],
+            [
+              -104.60808755171018,
+              50.44588695202727
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "File Number": "PL202600334",
+        "Address": "2048 Rose Street",
+        "Application Type": "Proposed C- Contract Zone",
+        "Description": "Proposed Transportation, Parking Lot (Surface parking lot)",
+        "Status": "Comment Sheet - Due by November 27, 2026",
+        "Comments Open": true,
+        "Public Notice URL": "https://www.regina.ca/export/sites/Regina.ca/business-development/land-property-development/.galleries/pdfs/Proposed-Development/PL202600334_Ltr_20261109_WebsiteNotice.pdf",
+        "Site Plan URL": null,
+        "Approximate Location": false,
+        "Matched Parcel APN": 515030600,
+        "Geocode Method": "city_address_point"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
               -104.6376228800674,
               50.43633039451579
             ],
@@ -303,8 +402,8 @@
         "Address": "3901 Princess Drive",
         "Application Type": "Discretionary Use",
         "Description": "Proposed Assembly, Religious land use",
-        "Status": "Comment Sheet - Due by November 6, 2026",
-        "Comments Open": true,
+        "Status": "The period for collecting comments has now closed",
+        "Comments Open": false,
         "Public Notice URL": "https://www.regina.ca/export/sites/Regina.ca/business-development/land-property-development/.galleries/pdfs/Proposed-Development/PL202600310_Ltr_20261014_WebNotice.pdf",
         "Site Plan URL": null,
         "Approximate Location": false,
