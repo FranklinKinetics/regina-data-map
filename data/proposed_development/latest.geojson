@@ -8,6 +8,81 @@
         "coordinates": [
           [
             [
+              -104.62779433963352,
+              50.45522384296975
+            ],
+            [
+              -104.62767854448244,
+              50.455223921004624
+            ],
+            [
+              -104.62756260885998,
+              50.45522399797649
+            ],
+            [
+              -104.62756328868309,
+              50.4555669170413
+            ],
+            [
+              -104.62767908388673,
+              50.45556683961869
+            ],
+            [
+              -104.62779502112802,
+              50.45556676253513
+            ],
+            [
+              -104.627910957593,
+              50.455566684835304
+            ],
+            [
+              -104.6280268954648,
+              50.45556642765515
+            ],
+            [
+              -104.62814269145329,
+              50.455566349275514
+            ],
+            [
+              -104.62814214799437,
+              50.455223520338656
+            ],
+            [
+              -104.62802621236726,
+              50.455223598270614
+            ],
+            [
+              -104.62791027525647,
+              50.45522376576702
+            ],
+            [
+              -104.62779433963352,
+              50.45522384296975
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "File Number": "PL202600341",
+        "Address": "1475 Athol Street",
+        "Application Type": "Discretionary Use",
+        "Description": "Proposed Assembly, Religious Land Use",
+        "Status": "Comment Sheet - Due by December 4, 2026",
+        "Comments Open": true,
+        "Public Notice URL": "https://www.regina.ca/export/sites/Regina.ca/business-development/land-property-development/.galleries/pdfs/Proposed-Development/PL202600341-1475-Athol-Street.pdf",
+        "Site Plan URL": null,
+        "Approximate Location": false,
+        "Matched Parcel APN": 494936400,
+        "Geocode Method": "city_address_point"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
               -104.60808755171018,
               50.44588695202727
             ],
