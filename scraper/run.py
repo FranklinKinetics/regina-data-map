@@ -11,6 +11,8 @@ import sys
 from datetime import date, datetime
 from pathlib import Path
 
+import requests
+
 from scraper.enrich import enrich_points
 from scraper.geocode import geocode_all
 from scraper.parcel_match import find_containing_parcel
@@ -222,14 +224,33 @@ def _flat_entries_to_geojson(entries: list[dict]) -> dict:
     }
 
 
-def run_population() -> None:
+def _fetch_or_keep_saved(fetch, data_dir: Path, label: str, stats: dict) -> list[dict] | None:
+    """For yearly StatCan series: if StatCan can't be reached (after the
+    retries in post_wds), keep last week's saved file instead of failing the
+    whole refresh, so the weekly City permit update still publishes. Returns
+    None when the saved file is kept. Still fails if there is no saved file."""
+    try:
+        return fetch()
+    except requests.RequestException as e:
+        if load_latest(data_dir) is None:
+            raise
+        # ::warning:: shows on the GitHub Actions run page, so a source that
+        # stays down is visible rather than silently stale.
+        print(f"::warning::{label}: Statistics Canada unreachable ({type(e).__name__}); keeping last saved data")
+        stats.setdefault("kept_saved", []).append(label)
+        return None
+
+
+def run_population(stats: dict) -> None:
     print("Fetching Statistics Canada population estimates...")
-    entries = fetch_population()
+    population_dir = DATA_DIR / "population"
+    entries = _fetch_or_keep_saved(fetch_population, population_dir, "Population", stats)
+    if entries is None:
+        return
     check_time_series_entries(entries, ["Year", "Population"], "Population")
     check_no_duplicate_keys([e["Year"] for e in entries], "Population")
     check_no_wild_swing(entries, "Population", "Population")
 
-    population_dir = DATA_DIR / "population"
     previous_fc = load_latest(population_dir)
     new_fc = _flat_entries_to_geojson(entries)
     diff = diff_features(previous_fc, new_fc, key_fn=lambda f: f["properties"]["Year"])
@@ -252,9 +273,12 @@ def run_rental_market() -> None:
     print(f"Rental Market: {diff.summary()}")
 
 
-def run_migration() -> None:
+def run_migration(stats: dict) -> None:
     print("Fetching Statistics Canada components of population change...")
-    entries = fetch_migration()
+    migration_dir = DATA_DIR / "migration"
+    entries = _fetch_or_keep_saved(fetch_migration, migration_dir, "Migration Components", stats)
+    if entries is None:
+        return
     check_time_series_entries(
         entries, ["Year", "Births", "Deaths", "Immigrants"], "Migration Components"
     )
@@ -268,7 +292,6 @@ def run_migration() -> None:
     for field in ("Births", "Deaths"):
         check_no_wild_swing(entries, field, "Migration Components")
 
-    migration_dir = DATA_DIR / "migration"
     previous_fc = load_latest(migration_dir)
     new_fc = _flat_entries_to_geojson(entries)
     diff = diff_features(previous_fc, new_fc, key_fn=lambda f: f["properties"]["Year"])
@@ -290,9 +313,9 @@ def main() -> int:
         zoning_fc, stats["zoning"] = run_zoning()
         # (the Build Watch 13-month permit file is not needed here, and it carries applicant names)
         stats["permit_history"] = run_permit_history(zoning_fc)
-        run_population()
+        run_population(stats)
         run_rental_market()
-        run_migration()
+        run_migration(stats)
     except VerificationError as e:
         print(f"VERIFICATION FAILED: {e}", file=sys.stderr)
         return 1
