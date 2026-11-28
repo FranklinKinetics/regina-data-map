@@ -4,9 +4,8 @@ change by census metropolitan area and census agglomeration". Breaks down
 *why* population is changing (births, deaths, immigration, migration),
 rather than just the total from population.py.
 """
-import requests
+from scraper.sources.statcan import post_wds
 
-WDS_URL = "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods"
 PRODUCT_ID = 17100149
 REGINA_GEO = 34  # Regina (CMA), Saskatchewan
 
@@ -30,9 +29,7 @@ def fetch_migration() -> list[dict]:
         {"productId": PRODUCT_ID, "coordinate": _coordinate(cid), "latestN": 15}
         for cid in COMPONENTS
     ]
-    resp = requests.post(WDS_URL, json=payload, timeout=30)
-    resp.raise_for_status()
-    results = resp.json()
+    results = post_wds(payload)
 
     by_year: dict[int, dict] = {}
     for entry in results:
